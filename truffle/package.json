@@ -1,0 +1,14 @@
+{
+  "name": "truffle",
+  "version": "1.0.0",
+  "description": "truffle environment for the bridge smart contracts development",
+  "main": "truffle-config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3"
+  }
+}
