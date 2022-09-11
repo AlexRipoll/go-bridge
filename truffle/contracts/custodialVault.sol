@@ -10,9 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract NFCustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
   
-  uint256 public costCustom = 1 ether;
   uint256 public costNative = 0.000075 ether;
-
 
   struct CustodyVault {
     uint256 tokenId;
@@ -25,6 +23,7 @@ contract NFCustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
 
   ERC721Enumerable nft;
 
+  // smart contract address to bind
   constructor(ERC721Enumerable _nft) {
     nft = _nft;
   }
