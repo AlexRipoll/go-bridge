@@ -9,13 +9,23 @@ import (
 )
 
 type Blockchain interface {
+	Vault
+	NFT
+}
+
+type Vault interface {
 	RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error)
-	ReleaseNFT(tokenId *big.Int, wallet common.Address) (*Tx, error)
+	ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error)
 	UpdateOwner(tokenId *big.Int, newHolder common.Address) (*Tx, error)
 	Withdraw() (*Tx, error)
 	EmergencyDelete(tokenId *big.Int) (*Tx, error)
 
 	HoldCustody(idx *big.Int) (*Custody, error)
+}
+
+type NFT interface {
+	Mint(ctx context.Context, destination, to string, tokenId *big.Int) (*Tx, error)
+	Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error)
 }
 
 type Tx struct {
@@ -52,8 +62,20 @@ func (geth geth) RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
 	return &tx, nil
 }
 
-func (geth geth) ReleaseNFT(tokenId *big.Int, wallet common.Address) (*Tx, error) {
-	panic("implement me")
+func (geth geth) ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {
+	t, err := geth.prepareTransactor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	walletAddress := common.HexToAddress(wallet)
+	gethTx, err := geth.custodialVault.ReleaseNFT(t, tokenId, walletAddress)
+	if err != nil {
+		return nil, err
+	}
+	tx := transactionToTx(gethTx)
+
+	return &tx, nil
 }
 
 func (geth geth) UpdateOwner(tokenId *big.Int, newHolder common.Address) (*Tx, error) {
@@ -70,6 +92,37 @@ func (geth geth) EmergencyDelete(tokenId *big.Int) (*Tx, error) {
 
 func (geth geth) HoldCustody(idx *big.Int) (*Custody, error) {
 	panic("implement me")
+}
+
+func (geth geth) Mint(ctx context.Context, destination, wallet string, tokenId *big.Int) (*Tx, error) {
+	t, err := geth.prepareTransactor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	walletAddress := common.HexToAddress(wallet)
+	gethTx, err := geth.nft[destination].BridgeMint(t, walletAddress, tokenId)
+	if err != nil {
+		return nil, err
+	}
+	tx := transactionToTx(gethTx)
+
+	return &tx, nil
+}
+
+func (geth geth) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
+	t, err := geth.prepareTransactor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	gethTx, err := geth.nft[origin].BridgeBurn(t, tokenId)
+	if err != nil {
+		return nil, err
+	}
+	tx := transactionToTx(gethTx)
+
+	return &tx, nil
 }
 
 type DeployRx struct {
