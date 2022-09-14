@@ -17,20 +17,29 @@ type geth struct {
 	evm.Config
 	client         *ethclient.Client
 	custodialVault *contract.CustosialVault
+	nft            map[string]*contract.NFT
 }
 
-func NewGeth(c *ethclient.Client, config evm.Config) (Blockchain, error) {
-
-	// TODO add contract address
-	vault, err := contract.NewCustosialVault(common.Address{}, c)
+func NewGeth(client *ethclient.Client, config evm.Config) (Blockchain, error) {
+	vault, err := contract.NewCustosialVault(common.HexToAddress(config.Contracts.Vault.Address), client)
 	if err != nil {
 		return nil, err
 	}
 
+	nftContractMap := make(map[string]*contract.NFT)
+	for _, c := range config.Contracts.NFT {
+		nftContract, err := contract.NewNFT(common.HexToAddress(c.Address), client)
+		if err != nil {
+			return nil, err
+		}
+		nftContractMap[c.Network] = nftContract
+	}
+
 	return geth{
-		Config: config,
-		client:         c,
+		Config:         config,
+		client:         client,
 		custodialVault: vault,
+		nft:            nftContractMap,
 	}, nil
 }
 
