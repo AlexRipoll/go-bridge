@@ -10,7 +10,6 @@ contract NFT is ERC721Enumerable, Ownable {
     using Strings for uint256;
     string public baseURI;
     string public baseExtension = ".json";
-    uint256 public maxSupply = 1000;
     bool public paused = false;
 
     constructor() ERC721("Net2Dev NFT Collection", "N2D") {
@@ -23,6 +22,10 @@ contract NFT is ERC721Enumerable, Ownable {
     
     function bridgeMint(address to, uint256 tokenId) public virtual onlyOwner() {
         _mint(to, tokenId);
+    }
+
+    function bridgeBurn(uint256 tokenId) public virtual onlyOwner() {
+        _burn(tokenId);
     }
 
     function walletOfOwner(address _owner)
