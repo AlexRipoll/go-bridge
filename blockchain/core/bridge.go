@@ -10,12 +10,14 @@ import (
 )
 
 type Bridge struct {
-	contracts evm.Blockchain
+	custodian evm.Custodian
+	bridgers map[string]evm.Bridger
 }
 
-func NewBridge(blockchain evm.Blockchain) (*Bridge, error) {
+func NewBridge(vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
 	return &Bridge{
-		blockchain,
+		custodian: vault,
+		bridgers: bridger,
 	}, nil
 }
 
@@ -55,6 +57,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 			return err
 		}
 		log.Printf("retain nft: %#v", tx)
+		// TODO add scanner to scan if the tx has been mined and then proceed with minting/burning/releasing
 		tx, err = b.mintNFT(ctx, destination, walletAddress, tokenId)
 		if err != nil {
 			return err
@@ -88,7 +91,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 }
 
 func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.contracts.RetainNFT(ctx, tokenId)
+	tx, err := b.custodian.RetainNFT(ctx, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +100,7 @@ func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
 }
 
 func (b Bridge) releaseNFT(ctx context.Context, walletAddress string, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.contracts.ReleaseNFT(ctx, walletAddress, tokenId)
+	tx, err := b.custodian.ReleaseNFT(ctx, walletAddress, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +109,11 @@ func (b Bridge) releaseNFT(ctx context.Context, walletAddress string, tokenId *b
 }
 
 func (b Bridge) mintNFT(ctx context.Context, destination, walletAddress string, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.contracts.Mint(ctx, destination, walletAddress, tokenId)
+	bridger, ok := b.bridgers[destination]
+	if !ok {
+		return nil, errors.New("unknown destination blockchain")
+	}
+	tx, err := bridger.Mint(ctx, destination, walletAddress, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +122,11 @@ func (b Bridge) mintNFT(ctx context.Context, destination, walletAddress string, 
 }
 
 func (b Bridge) burnNFT(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.contracts.Burn(ctx, origin, tokenId)
+	bridger, ok := b.bridgers[origin]
+	if !ok {
+		return nil, errors.New("unknown origin blockchain")
+	}
+	tx, err := bridger.Burn(ctx, origin, tokenId)
 	if err != nil {
 		return nil, err
 	}

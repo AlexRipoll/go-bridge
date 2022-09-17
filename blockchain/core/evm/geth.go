@@ -16,30 +16,54 @@ import (
 type geth struct {
 	evm.Config
 	client         *ethclient.Client
-	custodialVault *contract.CustosialVault
-	nft            map[string]*contract.NFT
 }
 
-func NewGeth(client *ethclient.Client, config evm.Config) (Blockchain, error) {
-	vault, err := contract.NewCustosialVault(common.HexToAddress(config.Contracts.Vault.Address), client)
+func NewGeth(client *ethclient.Client, config evm.Config) (*geth, error) {
+	return &geth{
+		Config:         config,
+		client:         client,
+	}, nil
+}
+
+type custodian struct {
+	geth
+	Contract *contract.CustosialVault
+}
+
+func NewCustodian(client *ethclient.Client, contractAddr string, config evm.Config) (Custodian, error) {
+	geth, err := NewGeth(client, config)
+	if err != nil {
+		return nil, err
+	}
+	vault, err := contract.NewCustosialVault(common.HexToAddress(contractAddr), client)
 	if err != nil {
 		return nil, err
 	}
 
-	nftContractMap := make(map[string]*contract.NFT)
-	for _, c := range config.Contracts.NFT {
-		nftContract, err := contract.NewNFT(common.HexToAddress(c.Address), client)
-		if err != nil {
-			return nil, err
-		}
-		nftContractMap[c.Network] = nftContract
+	return custodian{
+		geth: *geth,
+		Contract: vault,
+	}, nil
+}
+
+type bridger struct {
+	geth
+	Contract *contract.NFT
+}
+
+func NewBridger(client *ethclient.Client, contractAddr string, config evm.Config) (Bridger, error) {
+	geth, err := NewGeth(client, config)
+	if err != nil {
+		return nil, err
+	}
+	nft, err := contract.NewNFT(common.HexToAddress(contractAddr), client)
+	if err != nil {
+		return nil, err
 	}
 
-	return geth{
-		Config:         config,
-		client:         client,
-		custodialVault: vault,
-		nft:            nftContractMap,
+	return bridger{
+		geth: *geth,
+		Contract: nft,
 	}, nil
 }
 

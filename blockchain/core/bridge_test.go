@@ -14,9 +14,11 @@ func TestNewBridge(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	blockchainMock := evm.NewMockBlockchain(ctrl)
+	custodianMock := evm.NewMockCustodian(ctrl)
+	bridgers := make(map[string]evm.Bridger)
+
 	t.Run("initialize new bridge instance", func(t *testing.T) {
-		_, err := core.NewBridge(blockchainMock)
+		_, err := core.NewBridge(custodianMock, bridgers)
 		if err != nil {
 			t.Fatalf("expected nil error, got %v", err)
 		}
@@ -27,13 +29,20 @@ func TestBridgeRetainNFT(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	blockchainMock := evm.NewMockBlockchain(ctrl)
+	custodianMock := evm.NewMockCustodian(ctrl)
 
-	b, err := core.NewBridge(blockchainMock)
+	polygonBridgerMock := evm.NewMockBridger(ctrl)
+	hederaBridgerMock := evm.NewMockBridger(ctrl)
+
+	bridgers := make(map[string]evm.Bridger)
+	bridgers["polygon"] = polygonBridgerMock
+	bridgers["hedera"] = hederaBridgerMock
+
+	b, err := core.NewBridge(custodianMock, bridgers)
 	if err != nil {
 		t.Fatalf("expected nil error, got %v", err)
 	}
-	t.Run("successfully retain NFT and mint", func(t *testing.T) {
+	t.Run("successfully retain Bridger and mint", func(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "ethereum"
@@ -49,14 +58,14 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Nonce:     1,
 			To:        wallet,
 		}
-		blockchainMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
-		blockchainMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
+		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
+		polygonBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
 
 		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err != nil {
 			t.Fatalf("expected nil error, got %v", err)
 		}
 	})
-	t.Run("successfully burn copy and release NFT", func(t *testing.T) {
+	t.Run("successfully burn copy and release Bridger", func(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "polygon"
@@ -72,8 +81,8 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Nonce:     1,
 			To:        wallet,
 		}
-		blockchainMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
-		blockchainMock.EXPECT().ReleaseNFT(ctx, wallet, tokenId).Return(&evmTx, nil)
+		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
+		custodianMock.EXPECT().ReleaseNFT(ctx, wallet, tokenId).Return(&evmTx, nil)
 
 		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err != nil {
 			t.Fatalf("expected nil error, got %v", err)
@@ -83,6 +92,42 @@ func TestBridgeRetainNFT(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "polygon"
+		destination := "hedera"
+		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
+
+		evmTx := evm.Tx{
+			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
+			Size:      0,
+			ChainID:   big.NewInt(1),
+			Data:      []byte("data"),
+			Gas:       300000,
+			Nonce:     1,
+			To:        wallet,
+		}
+		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
+		hederaBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
+
+		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err != nil {
+			t.Fatalf("expected nil error, got %v", err)
+		}
+	})
+	t.Run("fail to transfer Bridger", func(t *testing.T) {
+		ctx := context.Background()
+		tokenId := big.NewInt(0)
+		origin := "ethereum"
+		destination := "polygon"
+		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
+
+		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(nil, errors.New("tx reverted"))
+
+		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err == nil {
+			t.Fatalf("expected nil error, got %v", err)
+		}
+	})
+	t.Run("unknown bridger blockchain", func(t *testing.T) {
+		ctx := context.Background()
+		tokenId := big.NewInt(0)
+		origin := "ethereum"
 		destination := "binance"
 		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
 
@@ -95,24 +140,12 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Nonce:     1,
 			To:        wallet,
 		}
-		blockchainMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil).Times(1)
-		blockchainMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
 
-		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err != nil {
-			t.Fatalf("expected nil error, got %v", err)
-		}
-	})
-	t.Run("fail to transfer NFT", func(t *testing.T) {
-		ctx := context.Background()
-		tokenId := big.NewInt(0)
-		origin := "ethereum"
-		destination := "polygon"
-		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
-
-		blockchainMock.EXPECT().RetainNFT(ctx, tokenId).Return(nil, errors.New("tx reverted"))
+		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
 
 		if err := b.TransferNFT(ctx, destination, origin, wallet, tokenId); err == nil {
-			t.Fatalf("expected nil error, got %v", err)
+			t.Fatal("expected error, got nil")
 		}
 	})
+
 }

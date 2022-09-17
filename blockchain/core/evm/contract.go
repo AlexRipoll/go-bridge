@@ -8,12 +8,7 @@ import (
 	"math/big"
 )
 
-type Blockchain interface {
-	Vault
-	NFT
-}
-
-type Vault interface {
+type Custodian interface {
 	RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error)
 	ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error)
 	UpdateOwner(tokenId *big.Int, newHolder common.Address) (*Tx, error)
@@ -23,7 +18,7 @@ type Vault interface {
 	HoldCustody(idx *big.Int) (*Custody, error)
 }
 
-type NFT interface {
+type Bridger interface {
 	Mint(ctx context.Context, destination, to string, tokenId *big.Int) (*Tx, error)
 	Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error)
 }
@@ -47,13 +42,13 @@ type Custody struct {
 	Holder  string
 }
 
-func (geth geth) RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
-	t, err := geth.prepareTransactor(ctx)
+func (c custodian) RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
+	t, err := c.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	gethTx, err := geth.custodialVault.RetainNFT(t, tokenId)
+	gethTx, err := c.Contract.RetainNFT(t, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +57,14 @@ func (geth geth) RetainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
 	return &tx, nil
 }
 
-func (geth geth) ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {
-	t, err := geth.prepareTransactor(ctx)
+func (c custodian) ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {
+	t, err := c.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	walletAddress := common.HexToAddress(wallet)
-	gethTx, err := geth.custodialVault.ReleaseNFT(t, tokenId, walletAddress)
+	gethTx, err := c.Contract.ReleaseNFT(t, tokenId, walletAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -78,30 +73,30 @@ func (geth geth) ReleaseNFT(ctx context.Context, wallet string, tokenId *big.Int
 	return &tx, nil
 }
 
-func (geth geth) UpdateOwner(tokenId *big.Int, newHolder common.Address) (*Tx, error) {
+func (c custodian) UpdateOwner(tokenId *big.Int, newHolder common.Address) (*Tx, error) {
 	panic("implement me")
 }
 
-func (geth geth) Withdraw() (*Tx, error) {
+func (c custodian) Withdraw() (*Tx, error) {
 	panic("implement me")
 }
 
-func (geth geth) EmergencyDelete(tokenId *big.Int) (*Tx, error) {
+func (c custodian) EmergencyDelete(tokenId *big.Int) (*Tx, error) {
 	panic("implement me")
 }
 
-func (geth geth) HoldCustody(idx *big.Int) (*Custody, error) {
+func (c custodian) HoldCustody(idx *big.Int) (*Custody, error) {
 	panic("implement me")
 }
 
-func (geth geth) Mint(ctx context.Context, destination, wallet string, tokenId *big.Int) (*Tx, error) {
-	t, err := geth.prepareTransactor(ctx)
+func (b bridger) Mint(ctx context.Context, destination, wallet string, tokenId *big.Int) (*Tx, error) {
+	t, err := b.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	walletAddress := common.HexToAddress(wallet)
-	gethTx, err := geth.nft[destination].BridgeMint(t, walletAddress, tokenId)
+	gethTx, err := b.Contract.BridgeMint(t, walletAddress, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -110,13 +105,13 @@ func (geth geth) Mint(ctx context.Context, destination, wallet string, tokenId *
 	return &tx, nil
 }
 
-func (geth geth) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
-	t, err := geth.prepareTransactor(ctx)
+func (b bridger) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
+	t, err := b.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	gethTx, err := geth.nft[origin].BridgeBurn(t, tokenId)
+	gethTx, err := b.Contract.BridgeBurn(t, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +131,6 @@ func (geth geth) Deploy(ctx context.Context) (*DeployRx, error) {
 		return nil, err
 	}
 
-	// TODO check nft construct argument
 	address, tx, _, err := contract.DeployCustosialVault(transactor, geth.client, common.Address{})
 	if err != nil {
 		return nil, err
