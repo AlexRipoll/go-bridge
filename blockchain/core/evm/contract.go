@@ -5,6 +5,7 @@ import (
 	"github.com/AlexRipoll/go-bridge/blockchain/contract"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"log"
 	"math/big"
 )
 
@@ -16,25 +17,27 @@ type Custodian interface {
 	EmergencyDelete(tokenId *big.Int) (*Tx, error)
 
 	HoldCustody(idx *big.Int) (*Custody, error)
+	Deployer
 }
 
 type Bridger interface {
 	Mint(ctx context.Context, destination, to string, tokenId *big.Int) (*Tx, error)
 	Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error)
+	Deployer
 }
 
 type Tx struct {
 	Hash string
 	Size float64
 	ChainID   *big.Int
-	Data      []byte
+	//Data      []byte
 	Gas       uint64
 	GasPrice  *big.Int
 	GasTipCap *big.Int
 	GasFeeCap *big.Int
 	Value     *big.Int
 	Nonce     uint64
-	To        string
+	//To        string
 }
 
 type Custody struct {
@@ -122,24 +125,63 @@ func (b bridger) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx
 
 type DeployRx struct {
 	Address common.Address
-	Tx      *types.Transaction
+	Tx      Tx
 }
 
-func (geth geth) Deploy(ctx context.Context) (*DeployRx, error) {
-	transactor, err := geth.prepareTransactor(ctx)
+func (c custodian) Deploy(ctx context.Context) ([]DeployRx, error) {
+	transactor, err := c.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	address, tx, _, err := contract.DeployCustosialVault(transactor, geth.client, common.Address{})
+	log.Printf("deploying contract on %s network", c.network)
+
+	var deployRxs []DeployRx
+	address, tx, _, err := contract.DeployNFT(transactor, c.conn)
 	if err != nil {
 		return nil, err
 	}
-
-	return &DeployRx{
+	deployRxs = append(deployRxs, DeployRx{
 		Address: address,
-		Tx:      tx,
-	}, nil
+		Tx:      transactionToTx(tx),
+	})
+
+	nonce, err := c.Nonce(ctx)
+	if err != nil {
+		return nil, err
+	}
+	transactor.Nonce = big.NewInt(int64(nonce))
+
+	address, tx, _, err = contract.DeployCustosialVault(transactor, c.conn, address)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("deployed contract address: %#v", deployRxs)
+
+	return deployRxs, err
+}
+
+func (b bridger) Deploy(ctx context.Context) ([]DeployRx, error) {
+	transactor, err := b.prepareTransactor(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("deploying contract on %s network", b.network)
+
+	var deployRxs []DeployRx
+	address, tx, _, err := contract.DeployNFT(transactor, b.conn)
+	if err != nil {
+		return nil, err
+	}
+
+	deployRxs = append(deployRxs, DeployRx{
+		Address: address,
+		Tx:      transactionToTx(tx),
+	})
+	log.Printf("deployed contract address: %#v", deployRxs)
+
+	return deployRxs, err
 }
 
 func transactionToTx(transaction *types.Transaction) Tx {
@@ -148,13 +190,13 @@ func transactionToTx(transaction *types.Transaction) Tx {
 		Size: float64(transaction.Size()),
 		//From:    transaction.,
 		ChainID:   transaction.ChainId(),
-		Data:      transaction.Data(),
+		//Data:      transaction.Data(),
 		Gas:       transaction.Gas(),
 		GasPrice:  transaction.GasPrice(),
 		GasTipCap: transaction.GasTipCap(),
 		GasFeeCap: transaction.GasFeeCap(),
 		Value:     transaction.Value(),
 		Nonce:     transaction.Nonce(),
-		To:        transaction.To().Hex(),
+		//To:        transaction.To().Hex(),
 	}
 }

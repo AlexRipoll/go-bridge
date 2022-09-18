@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
+	"github.com/AlexRipoll/go-bridge/blockchain/config"
 	"github.com/AlexRipoll/go-bridge/blockchain/contract"
-	"github.com/AlexRipoll/go-bridge/blockchain/sys/evm"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -13,66 +13,86 @@ import (
 	"math/big"
 )
 
-type geth struct {
-	evm.Config
-	client         *ethclient.Client
+type Client struct {
+	config.Config
+	conn    *ethclient.Client
+	network string
 }
 
-func NewGeth(client *ethclient.Client, config evm.Config) (*geth, error) {
-	return &geth{
-		Config:         config,
-		client:         client,
+func NewClient(conn *ethclient.Client, config config.Config, network string) (*Client, error) {
+	return &Client{
+		Config:  config,
+		conn:    conn,
+		network: network,
 	}, nil
 }
 
+type ContractTransactor interface {
+	Address() (common.Address, error)
+	Nonce(ctx context.Context) (uint64, error)
+	EstimatedGasPrice(ctx context.Context) (*big.Int, error)
+	ChainId(ctx context.Context) (*big.Int, error)
+}
+
+type Deployer interface {
+	Deploy(ctx context.Context) ([]DeployRx, error)
+}
+
 type custodian struct {
-	geth
+	Client
 	Contract *contract.CustosialVault
 }
 
-func NewCustodian(client *ethclient.Client, contractAddr string, config evm.Config) (Custodian, error) {
-	geth, err := NewGeth(client, config)
-	if err != nil {
-		return nil, err
-	}
-	vault, err := contract.NewCustosialVault(common.HexToAddress(contractAddr), client)
+func NewCustodian(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Custodian, error) {
+	geth, err := NewClient(conn, config, network)
 	if err != nil {
 		return nil, err
 	}
 
+	var vault *contract.CustosialVault
+	if contractAddr != "" {
+		vault, err = contract.NewCustosialVault(common.HexToAddress(contractAddr), conn)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return custodian{
-		geth: *geth,
+		Client:   *geth,
 		Contract: vault,
 	}, nil
 }
 
 type bridger struct {
-	geth
+	Client
 	Contract *contract.NFT
 }
 
-func NewBridger(client *ethclient.Client, contractAddr string, config evm.Config) (Bridger, error) {
-	geth, err := NewGeth(client, config)
-	if err != nil {
-		return nil, err
-	}
-	nft, err := contract.NewNFT(common.HexToAddress(contractAddr), client)
+func NewBridger(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Bridger, error) {
+	geth, err := NewClient(conn, config, network)
 	if err != nil {
 		return nil, err
 	}
 
+	var nft *contract.NFT
+	if contractAddr != "" {
+		nft, err = contract.NewNFT(common.HexToAddress(contractAddr), conn)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return bridger{
-		geth: *geth,
+		Client:   *geth,
 		Contract: nft,
 	}, nil
 }
 
-func (geth geth) privateKey() (*ecdsa.PrivateKey, error) {
-	return crypto.HexToECDSA(geth.Pvk)
+func (c Client) privateKey() (*ecdsa.PrivateKey, error) {
+	return crypto.HexToECDSA(c.PrivateKey)
 }
 
-func (geth geth) Address() (common.Address, error) {
-	privateKey, err := geth.privateKey()
+func (c Client) Address() (common.Address, error) {
+	privateKey, err := c.privateKey()
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -88,39 +108,39 @@ func (geth geth) Address() (common.Address, error) {
 	return address, nil
 }
 
-func (geth geth) Nonce(ctx context.Context) (uint64, error) {
-	address, err := geth.Address()
+func (c Client) Nonce(ctx context.Context) (uint64, error) {
+	address, err := c.Address()
 	if err != nil {
 		return 0, err
 	}
-	return geth.client.PendingNonceAt(ctx, address)
+	return c.conn.PendingNonceAt(ctx, address)
 }
 
-func (geth geth) EstimatedGasPrice(ctx context.Context) (*big.Int, error) {
-	return geth.client.SuggestGasPrice(ctx)
+func (c Client) EstimatedGasPrice(ctx context.Context) (*big.Int, error) {
+	return c.conn.SuggestGasPrice(ctx)
 }
 
-func (geth geth) ChainId(ctx context.Context) (*big.Int, error) {
-	return geth.client.ChainID(ctx)
+func (c Client) ChainId(ctx context.Context) (*big.Int, error) {
+	return c.conn.ChainID(ctx)
 }
 
-func (geth geth) prepareTransactor(ctx context.Context) (*bind.TransactOpts, error) {
-	privateKeyECDSA, err := geth.privateKey()
+func (c Client) prepareTransactor(ctx context.Context) (*bind.TransactOpts, error) {
+	privateKeyECDSA, err := c.privateKey()
 	if err != nil {
 		return nil, err
 	}
 
-	chainId, err := geth.ChainId(ctx)
+	chainId, err := c.ChainId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	nonce, err := geth.Nonce(ctx)
+	nonce, err := c.Nonce(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	gasPrice, err := geth.EstimatedGasPrice(ctx)
+	gasPrice, err := c.EstimatedGasPrice(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +151,7 @@ func (geth geth) prepareTransactor(ctx context.Context) (*bind.TransactOpts, err
 	}
 	transactor.Nonce = big.NewInt(int64(nonce))
 	transactor.Value = big.NewInt(0)
-	transactor.GasLimit = geth.GasLimit
+	//transactor.GasLimit = c.GasLimit
 	transactor.GasPrice = gasPrice
 
 	return transactor, nil

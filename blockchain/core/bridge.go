@@ -26,14 +26,14 @@ type Tx struct {
 	Size float64
 	//From string
 	ChainID   *big.Int
-	Data      []byte
+	//Data      []byte
 	Gas       uint64
 	GasPrice  *big.Int
 	GasTipCap *big.Int
 	GasFeeCap *big.Int
 	Value     *big.Int
 	Nonce     uint64
-	To        string
+	//To        string
 }
 
 type Rx struct {
@@ -56,13 +56,13 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 		if err != nil {
 			return err
 		}
-		log.Printf("retain nft: %#v", tx)
+		log.Printf("retain nft: %v", tx)
 		// TODO add scanner to scan if the tx has been mined and then proceed with minting/burning/releasing
-		tx, err = b.mintNFT(ctx, destination, walletAddress, tokenId)
+		_, err = b.mintNFT(ctx, destination, walletAddress, tokenId)
 		if err != nil {
 			return err
 		}
-		log.Printf("mint nft: %#v", tx)
+		//log.Printf("mint nft: %#v", tx)
 	} else if destination == "ethereum" {
 		tx, err := b.burnNFT(ctx, origin, tokenId)
 		if err != nil {
@@ -132,6 +132,21 @@ func (b Bridge) burnNFT(ctx context.Context, origin string, tokenId *big.Int) (*
 	}
 
 	return toTx(tx), nil
+}
+
+func (b Bridge) Deploy(ctx context.Context) error {
+	_, err := b.custodian.Deploy(ctx)
+	if err != nil {
+		return err
+	}
+	for _, bridger := range b.bridgers {
+		_, err = bridger.Deploy(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func toTx(tx *evm.Tx) *Tx {

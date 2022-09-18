@@ -53,10 +53,8 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
 			Size:      0,
 			ChainID:   big.NewInt(1),
-			Data:      []byte("data"),
 			Gas:       300000,
 			Nonce:     1,
-			To:        wallet,
 		}
 		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
 		polygonBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
@@ -76,10 +74,8 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
 			Size:      0,
 			ChainID:   big.NewInt(1),
-			Data:      []byte("data"),
 			Gas:       300000,
 			Nonce:     1,
-			To:        wallet,
 		}
 		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
 		custodianMock.EXPECT().ReleaseNFT(ctx, wallet, tokenId).Return(&evmTx, nil)
@@ -99,10 +95,8 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
 			Size:      0,
 			ChainID:   big.NewInt(1),
-			Data:      []byte("data"),
 			Gas:       300000,
 			Nonce:     1,
-			To:        wallet,
 		}
 		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
 		hederaBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
@@ -135,10 +129,8 @@ func TestBridgeRetainNFT(t *testing.T) {
 			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
 			Size:      0,
 			ChainID:   big.NewInt(1),
-			Data:      []byte("data"),
 			Gas:       300000,
 			Nonce:     1,
-			To:        wallet,
 		}
 
 		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
