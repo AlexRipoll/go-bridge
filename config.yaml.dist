@@ -1,0 +1,24 @@
+# rename this file to config.yaml
+# DO NOT SHARE THIS FILE WITH ANYONE
+
+privatekey: ""    # add your private key
+walletaddress: "" # add a wallet address for the given private key
+gaslimit:
+networks:
+  - name: "rinkeby"
+    url: "https://rinkeby.infura.io/v3/72902afeffe44eeba2ed93d798f87ebd"
+    type: "custodian"
+    contracts:
+      bridge: ""  # add the deployed contract address
+      vault: ""   # add the deployed contract address
+  - name: "mumbai"
+    url: "https://matic-mumbai.chainstacklabs.com"
+    type: "bridger"
+    contracts:
+      bridge: ""  # add the deployed contract address
+  - name: "binance-testnet"
+    url: "https://data-seed-prebsc-1-s1.binance.org:8545"
+    type: "bridger"
+    contracts:
+      bridge: ""  # add the deployed contract address
+

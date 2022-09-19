@@ -16,6 +16,11 @@ func main() {
 
 	flag.Parse()
 
+	config, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if *deploy {
 		var custodian evm.Custodian
 		bridgers := make(map[string]evm.Bridger)
