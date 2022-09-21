@@ -3,6 +3,7 @@ package evm
 import (
 	"context"
 	"github.com/AlexRipoll/go-bridge/blockchain/contract"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"log"
@@ -23,13 +24,18 @@ type Custodian interface {
 type Bridger interface {
 	Mint(ctx context.Context, destination, to string, tokenId *big.Int) (*Tx, error)
 	Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error)
+	Account
 	Deployer
 }
 
+type Account interface {
+	TokensOf(wallet string) ([]*big.Int, error)
+}
+
 type Tx struct {
-	Hash string
-	Size float64
-	ChainID   *big.Int
+	Hash    string
+	Size    float64
+	ChainID *big.Int
 	//Data      []byte
 	Gas       uint64
 	GasPrice  *big.Int
@@ -123,6 +129,17 @@ func (b bridger) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx
 	return &tx, nil
 }
 
+func (b bridger) TokensOf(wallet string) ([]*big.Int, error) {
+	address := common.HexToAddress(wallet)
+	tokenIds, err := b.Contract.WalletOfOwner(&bind.CallOpts{}, address)
+	if err != nil {
+		return nil, err
+	}
+
+	return tokenIds, err
+	// TODO fetch each token data in IPFS and  return ERC721s' data
+}
+
 type DeployRx struct {
 	Address common.Address
 	Tx      Tx
@@ -145,6 +162,7 @@ func (c custodian) Deploy(ctx context.Context) ([]DeployRx, error) {
 		Address: address,
 		Tx:      transactionToTx(tx),
 	})
+	log.Printf("deployed contract address: %v", address)
 
 	nonce, err := c.Nonce(ctx)
 	if err != nil {
@@ -156,7 +174,11 @@ func (c custodian) Deploy(ctx context.Context) ([]DeployRx, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("deployed contract address: %#v", deployRxs)
+	deployRxs = append(deployRxs, DeployRx{
+		Address: address,
+		Tx:      transactionToTx(tx),
+	})
+	log.Printf("deployed contract address: %v", address)
 
 	return deployRxs, err
 }
@@ -179,7 +201,7 @@ func (b bridger) Deploy(ctx context.Context) ([]DeployRx, error) {
 		Address: address,
 		Tx:      transactionToTx(tx),
 	})
-	log.Printf("deployed contract address: %#v", deployRxs)
+	log.Printf("deployed contract address: %v", address)
 
 	return deployRxs, err
 }
@@ -189,7 +211,7 @@ func transactionToTx(transaction *types.Transaction) Tx {
 		Hash: transaction.Hash().Hex(),
 		Size: float64(transaction.Size()),
 		//From:    transaction.,
-		ChainID:   transaction.ChainId(),
+		ChainID: transaction.ChainId(),
 		//Data:      transaction.Data(),
 		Gas:       transaction.Gas(),
 		GasPrice:  transaction.GasPrice(),

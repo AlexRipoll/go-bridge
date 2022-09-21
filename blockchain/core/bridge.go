@@ -11,13 +11,13 @@ import (
 
 type Bridge struct {
 	custodian evm.Custodian
-	bridgers map[string]evm.Bridger
+	bridgers  map[string]evm.Bridger
 }
 
 func NewBridge(vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
 	return &Bridge{
 		custodian: vault,
-		bridgers: bridger,
+		bridgers:  bridger,
 	}, nil
 }
 
@@ -25,7 +25,7 @@ type Tx struct {
 	Hash string
 	Size float64
 	//From string
-	ChainID   *big.Int
+	ChainID *big.Int
 	//Data      []byte
 	Gas       uint64
 	GasPrice  *big.Int
@@ -88,6 +88,10 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 	}
 
 	return nil
+}
+
+func (b Bridge) WalletTokens(address string, blockchain string) ([]*big.Int, error) {
+	return b.bridgers[blockchain].TokensOf(address)
 }
 
 func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {

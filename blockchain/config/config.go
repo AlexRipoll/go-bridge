@@ -6,16 +6,16 @@ import (
 )
 
 type Config struct {
-	PrivateKey      string
-	WalletAddress  string
-	GasLimit uint64
-	Networks []Network
+	PrivateKey    string
+	WalletAddress string
+	GasLimit      uint64
+	Networks      []Network
 }
 
 type Network struct {
-	Name string
-	Url string
-	Type string
+	Name      string
+	Url       string
+	Type      string
 	Contracts map[string]string
 }
 
@@ -24,10 +24,10 @@ func Load() (Config, error) {
 	viper.SetDefault("LayoutDir", "layouts")
 	viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 	viper.SetConfigName("config") // name of config file (without extension)
-	viper.SetConfigType("yaml") // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(".")               // optionally look for config in the working directory
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	viper.SetConfigType("yaml")   // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath(".")      // optionally look for config in the working directory
+	err := viper.ReadInConfig()   // Find and read the config file
+	if err != nil {               // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
 	var c Config

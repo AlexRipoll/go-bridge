@@ -50,11 +50,11 @@ func TestBridgeRetainNFT(t *testing.T) {
 		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
 
 		evmTx := evm.Tx{
-			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
-			Size:      0,
-			ChainID:   big.NewInt(1),
-			Gas:       300000,
-			Nonce:     1,
+			Hash:    "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
+			Size:    0,
+			ChainID: big.NewInt(1),
+			Gas:     300000,
+			Nonce:   1,
 		}
 		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)
 		polygonBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
@@ -71,11 +71,11 @@ func TestBridgeRetainNFT(t *testing.T) {
 		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
 
 		evmTx := evm.Tx{
-			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
-			Size:      0,
-			ChainID:   big.NewInt(1),
-			Gas:       300000,
-			Nonce:     1,
+			Hash:    "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
+			Size:    0,
+			ChainID: big.NewInt(1),
+			Gas:     300000,
+			Nonce:   1,
 		}
 		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
 		custodianMock.EXPECT().ReleaseNFT(ctx, wallet, tokenId).Return(&evmTx, nil)
@@ -92,11 +92,11 @@ func TestBridgeRetainNFT(t *testing.T) {
 		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
 
 		evmTx := evm.Tx{
-			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
-			Size:      0,
-			ChainID:   big.NewInt(1),
-			Gas:       300000,
-			Nonce:     1,
+			Hash:    "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
+			Size:    0,
+			ChainID: big.NewInt(1),
+			Gas:     300000,
+			Nonce:   1,
 		}
 		polygonBridgerMock.EXPECT().Burn(ctx, origin, tokenId).Return(&evmTx, nil)
 		hederaBridgerMock.EXPECT().Mint(ctx, destination, wallet, tokenId).Return(&evmTx, nil)
@@ -126,11 +126,11 @@ func TestBridgeRetainNFT(t *testing.T) {
 		wallet := "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
 
 		evmTx := evm.Tx{
-			Hash:      "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
-			Size:      0,
-			ChainID:   big.NewInt(1),
-			Gas:       300000,
-			Nonce:     1,
+			Hash:    "3a6eb0790f39ac87c94f3856b2dd2c5d110e6811602261a9a923d3bb23adc8b7",
+			Size:    0,
+			ChainID: big.NewInt(1),
+			Gas:     300000,
+			Nonce:   1,
 		}
 
 		custodianMock.EXPECT().RetainNFT(ctx, tokenId).Return(&evmTx, nil)

@@ -10,13 +10,13 @@ type Config struct {
 }
 
 type Network struct {
-	Name string
-	RpcUrl string
+	Name     string
+	RpcUrl   string
 	Contract []Contract
 }
 
 type Contract struct {
-	Type string
-	Name string
+	Type    string
+	Name    string
 	Address string
 }

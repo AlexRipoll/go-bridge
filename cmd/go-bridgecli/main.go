@@ -21,38 +21,39 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if *deploy {
-		var custodian evm.Custodian
-		bridgers := make(map[string]evm.Bridger)
-		for _, n := range config.Networks {
-			conn, err := ethclient.Dial(n.Url)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			switch n.Type {
-			case "custodian":
-				custodian, err = evm.NewCustodian(conn, n.Contracts["vault"], config, n.Name)
-				if err != nil {
-					log.Fatal(err)
-				}
-			case "bridger":
-				bridger, err := evm.NewBridger(conn, n.Contracts["bridge"], config, n.Name)
-				if err != nil {
-					log.Fatal(err)
-				}
-				bridgers[n.Name] = bridger
-			default:
-				log.Fatal("unknown network type")
-			}
-
-		}
-		bridge, err := core.NewBridge(custodian, bridgers)
+	var custodian evm.Custodian
+	bridgers := make(map[string]evm.Bridger)
+	for _, n := range config.Networks {
+		conn, err := ethclient.Dial(n.Url)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		switch n.Type {
+		case "custodian":
+			custodian, err = evm.NewCustodian(conn, n.Contracts["vault"], config, n.Name)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "bridger":
+			bridger, err := evm.NewBridger(conn, n.Contracts["bridge"], config, n.Name)
+			if err != nil {
+				log.Fatal(err)
+			}
+			bridgers[n.Name] = bridger
+		default:
+			log.Fatal("unknown network type")
+		}
+
+	}
+	bridge, err := core.NewBridge(custodian, bridgers)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if *deploy {
 		if err = bridge.Deploy(context.Background()); err != nil {
 			log.Fatal(errors.Wrap(err, "error deploying contract"))
 		}
+		return
 	}
 }
