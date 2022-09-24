@@ -9,6 +9,7 @@ type Config struct {
 	PrivateKey    string
 	WalletAddress string
 	GasLimit      uint64
+	MainNetwork   string
 	Networks      map[string]Network
 }
 
