@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
 	"log"
 	"math/big"
@@ -91,6 +92,9 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 }
 
 func (b Bridge) WalletTokens(address string, blockchain string) ([]*big.Int, error) {
+	if _, exists := b.bridgers[blockchain]; !exists {
+		return nil, fmt.Errorf("unknown client network %s", blockchain)
+	}
 	return b.bridgers[blockchain].TokensOf(address)
 }
 
