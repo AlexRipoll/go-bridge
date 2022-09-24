@@ -9,11 +9,10 @@ type Config struct {
 	PrivateKey    string
 	WalletAddress string
 	GasLimit      uint64
-	Networks      []Network
+	Networks      map[string]Network
 }
 
 type Network struct {
-	Name      string
 	Url       string
 	Type      string
 	Contracts map[string]string
