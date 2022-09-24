@@ -51,7 +51,7 @@ func main() {
 		}
 
 	}
-	bridge, err := core.NewBridge(custodian, bridgers)
+	bridge, err := core.NewBridge(config.MainNetwork, custodian, bridgers)
 	if err != nil {
 		log.Fatal(err)
 	}

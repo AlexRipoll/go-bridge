@@ -11,12 +11,14 @@ import (
 )
 
 type Bridge struct {
+	mainNetwork string
 	custodian evm.Custodian
 	bridgers  map[string]evm.Bridger
 }
 
-func NewBridge(vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
+func NewBridge(mainNetwork string, vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
 	return &Bridge{
+		mainNetwork: mainNetwork,
 		custodian: vault,
 		bridgers:  bridger,
 	}, nil
@@ -52,7 +54,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 	if origin == destination {
 		return errors.New("destination blockchain must be different than origin")
 	}
-	if origin == "ethereum" {
+	if origin == b.mainNetwork {
 		tx, err := b.retainNFT(ctx, tokenId)
 		if err != nil {
 			return err
@@ -64,7 +66,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 			return err
 		}
 		//log.Printf("mint nft: %#v", tx)
-	} else if destination == "ethereum" {
+	} else if destination == b.mainNetwork {
 		tx, err := b.burnNFT(ctx, origin, tokenId)
 		if err != nil {
 			return err
