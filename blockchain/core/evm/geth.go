@@ -34,6 +34,10 @@ type ContractTransactor interface {
 	ChainId(ctx context.Context) (*big.Int, error)
 }
 
+type Reader interface {
+	CurrentBlock(ctx context.Context) (uint64, error)
+}
+
 type Deployer interface {
 	Deploy(ctx context.Context) ([]DeployRx, error)
 }
@@ -122,6 +126,10 @@ func (c Client) EstimatedGasPrice(ctx context.Context) (*big.Int, error) {
 
 func (c Client) ChainId(ctx context.Context) (*big.Int, error) {
 	return c.conn.ChainID(ctx)
+}
+
+func (c Client) CurrentBlock(ctx context.Context) (uint64, error) {
+	return c.conn.BlockNumber(ctx)
 }
 
 func (c Client) prepareTransactor(ctx context.Context) (*bind.TransactOpts, error) {

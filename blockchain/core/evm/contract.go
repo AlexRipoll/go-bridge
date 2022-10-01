@@ -22,8 +22,8 @@ type Custodian interface {
 }
 
 type Bridger interface {
-	Mint(ctx context.Context, destination, to string, tokenId *big.Int) (*Tx, error)
-	Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error)
+	Mint(ctx context.Context, to string, tokenId *big.Int) (*Tx, error)
+	Burn(ctx context.Context, tokenId *big.Int) (*Tx, error)
 	Account
 	Deployer
 }
@@ -98,7 +98,7 @@ func (c custodian) HoldCustody(idx *big.Int) (*Custody, error) {
 	panic("implement me")
 }
 
-func (b bridger) Mint(ctx context.Context, destination, wallet string, tokenId *big.Int) (*Tx, error) {
+func (b bridger) Mint(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {
 	t, err := b.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ func (b bridger) Mint(ctx context.Context, destination, wallet string, tokenId *
 	return &tx, nil
 }
 
-func (b bridger) Burn(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
+func (b bridger) Burn(ctx context.Context, tokenId *big.Int) (*Tx, error) {
 	t, err := b.prepareTransactor(ctx)
 	if err != nil {
 		return nil, err

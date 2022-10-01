@@ -2,18 +2,27 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
+	"github.com/AlexRipoll/go-bridge/blockchain/sys/storage"
 	"log"
 	"math/big"
 	"unsafe"
+)
+
+const (
+	MintAction = "mint"
+	BurnAction = "burn"
+	ReleaseAction = "release"
 )
 
 type Bridge struct {
 	mainNetwork string
 	custodian evm.Custodian
 	bridgers  map[string]evm.Bridger
+	storage storage.Storage
 }
 
 func NewBridge(mainNetwork string, vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
@@ -39,13 +48,17 @@ type Tx struct {
 	//To        string
 }
 
-type Rx struct {
-	hash string
+type TxData struct {
+	Wallet string `json:"wallet"`
+	TokenId *big.Int `json:"token_id"`
+	Origin string `json:"origin"`
+	Destination string `json:"destination"`
 }
 
-// TransferNFT transfers the specified token with tokenId from the origin blockchain to the destination blockchain.
-// If from is the native blockchain, then the token is retained in the custody vault and a copy of it will be minted
-// in the destination blockchain.
+// TransferNFT initiates the transfer of a token from one blockchain to another.
+// If from is the native blockchain, then the token is retained in the custody vault. Once the Tx event is received by
+// the Subscriber, it will be digested and the CompleteTokenTransfer will be notified once the action needed can be
+// executed.
 // In case the token is transferred from a non-native blockchain to the native blockchain, the token copy will be burnt
 // and the token in the custody wallet will be released.
 // In case the token is transferred between non-native blockchains, the token copy from the origin will be burnt and
@@ -54,40 +67,49 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 	if origin == destination {
 		return errors.New("destination blockchain must be different than origin")
 	}
+
+	buf, err :=json.Marshal(TxData{
+		Wallet:      walletAddress,
+		TokenId: tokenId,
+		Origin:      origin,
+		Destination: destination,
+	})
+	if err != nil {
+		return err
+	}
+
 	if origin == b.mainNetwork {
 		tx, err := b.retainNFT(ctx, tokenId)
 		if err != nil {
 			return err
 		}
-		log.Printf("retain nft: %v", tx)
-		// TODO add scanner to scan if the tx has been mined and then proceed with minting/burning/releasing
-		_, err = b.mintNFT(ctx, destination, walletAddress, tokenId)
-		if err != nil {
+
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
 			return err
 		}
-		//log.Printf("mint nft: %#v", tx)
+		log.Printf("retain nft: %v", tx)
 	} else if destination == b.mainNetwork {
 		tx, err := b.burnNFT(ctx, origin, tokenId)
 		if err != nil {
 			return err
 		}
 		log.Printf("burn nft: %#v", tx)
-		tx, err = b.releaseNFT(ctx, walletAddress, tokenId)
-		if err != nil {
+
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
 			return err
 		}
-		log.Printf("release nft: %#v", tx)
+		log.Printf("retain nft: %v", tx)
 	} else {
 		tx, err := b.burnNFT(ctx, origin, tokenId)
 		if err != nil {
 			return err
 		}
 		log.Printf("burn nft: %#v", tx)
-		tx, err = b.mintNFT(ctx, destination, walletAddress, tokenId)
-		if err != nil {
+
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
 			return err
 		}
-		log.Printf("mint nft: %#v", tx)
+		log.Printf("retain nft: %v", tx)
 	}
 
 	return nil
@@ -123,7 +145,7 @@ func (b Bridge) mintNFT(ctx context.Context, destination, walletAddress string, 
 	if !ok {
 		return nil, errors.New("unknown destination blockchain")
 	}
-	tx, err := bridger.Mint(ctx, destination, walletAddress, tokenId)
+	tx, err := bridger.Mint(ctx, walletAddress, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +158,7 @@ func (b Bridge) burnNFT(ctx context.Context, origin string, tokenId *big.Int) (*
 	if !ok {
 		return nil, errors.New("unknown origin blockchain")
 	}
-	tx, err := bridger.Burn(ctx, origin, tokenId)
+	tx, err := bridger.Burn(ctx, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +179,45 @@ func (b Bridge) Deploy(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (b Bridge) CompleteTokenTransfer(ctx context.Context, ch chan evm.EventRx) error {
+	for {
+		eventRx := <- ch
+
+		buf, err := b.storage.Get([]byte(eventRx.TxHash.String()))
+		if err != nil {
+			return err
+		}
+
+		var txData TxData
+		if err := json.Unmarshal(buf, &txData); err != nil {
+			return err
+		}
+
+		switch eventRx.Action {
+		case MintAction:
+			tx, err := b.bridgers[txData.Destination].Mint(ctx, txData.Wallet, txData.TokenId)
+			if err != nil {
+				return err
+			}
+			log.Println("Mint Tx: ", tx)
+		case BurnAction:
+			tx, err := b.bridgers[txData.Destination].Burn(ctx, txData.TokenId)
+			if err != nil {
+				return err
+			}
+			log.Println("Burn Tx: ", tx)
+		case ReleaseAction:
+			tx, err := b.custodian.ReleaseNFT(ctx, txData.Wallet, txData.TokenId)
+			if err != nil {
+				return err
+			}
+			log.Println("Release Tx: ", tx)
+		default:
+			return fmt.Errorf("unknow action; %v", eventRx.Action)
+		}
+	}
 }
 
 func toTx(tx *evm.Tx) *Tx {
