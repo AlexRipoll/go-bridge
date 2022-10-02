@@ -7,6 +7,7 @@ import (
 	"github.com/AlexRipoll/go-bridge/blockchain/config"
 	"github.com/AlexRipoll/go-bridge/blockchain/core"
 	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
+	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gorilla/mux"
 	"math/big"
@@ -23,7 +24,7 @@ func NewHandler(config config.Config) (*handler, error) {
 	bridgers := make(map[string]evm.Bridger)
 
 	for name, network := range config.Networks {
-		conn, err := ethclient.Dial(network.Url)
+		conn, err := ethclient.Dial(network.Http)
 		if err != nil {
 			return nil, err
 		}
@@ -79,4 +80,8 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h handler) CompleteTransfer(ch chan scanner.EventRx) error {
+	return h.bridge.CompleteTransfer(context.Background(), ch)
 }

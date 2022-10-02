@@ -14,8 +14,9 @@ type Config struct {
 }
 
 type Network struct {
-	Url       string
-	Type      string
+	Http string
+	Ws string
+	Type string
 	Contracts map[string]string
 }
 

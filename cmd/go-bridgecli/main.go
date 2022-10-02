@@ -28,7 +28,7 @@ func main() {
 	var custodian evm.Custodian
 	bridgers := make(map[string]evm.Bridger)
 	for name, network := range config.Networks {
-		conn, err := ethclient.Dial(network.Url)
+		conn, err := ethclient.Dial(network.Http)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -63,7 +63,7 @@ func main() {
 
 			networkName := config.MainNetwork
 			network := config.Networks[networkName]
-			conn, err := ethclient.Dial(network.Url)
+			conn, err := ethclient.Dial(network.Http)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -73,7 +73,7 @@ func main() {
 			}
 			bridgers[networkName] = minter
 
-			tx, err := minter.Mint(context.Background(), networkName, walletAddr, big.NewInt(6) )
+			tx, err := minter.Mint(context.Background(), walletAddr, big.NewInt(6) )
 			if err != nil {
 				log.Fatal(" error minting token: ", err)
 			}

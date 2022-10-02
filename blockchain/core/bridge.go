@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
+	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
 	"github.com/AlexRipoll/go-bridge/blockchain/sys/storage"
 	"log"
 	"math/big"
@@ -57,7 +58,7 @@ type TxData struct {
 
 // TransferNFT initiates the transfer of a token from one blockchain to another.
 // If from is the native blockchain, then the token is retained in the custody vault. Once the Tx event is received by
-// the Subscriber, it will be digested and the CompleteTokenTransfer will be notified once the action needed can be
+// the Subscriber, it will be digested and the CompleteTransfer will be notified once the action needed can be
 // executed.
 // In case the token is transferred from a non-native blockchain to the native blockchain, the token copy will be burnt
 // and the token in the custody wallet will be released.
@@ -181,7 +182,7 @@ func (b Bridge) Deploy(ctx context.Context) error {
 	return nil
 }
 
-func (b Bridge) CompleteTokenTransfer(ctx context.Context, ch chan evm.EventRx) error {
+func (b Bridge) CompleteTransfer(ctx context.Context, ch chan scanner.EventRx) error {
 	for {
 		eventRx := <- ch
 

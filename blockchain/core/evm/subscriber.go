@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/blockchain/contract"
+	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -18,7 +19,6 @@ type Subscriber struct {
 	conn *ethclient.Client
 	contract common.Address
 }
-// 	client, err := ethclient.Dial("wss://rinkeby.infura.io/ws/v3/72902afeffe44eeba2ed93d798f87ebd")
 
 func NewSubscriber(client *ethclient.Client, contractAddr string) Subscriber {
 
@@ -28,12 +28,8 @@ func NewSubscriber(client *ethclient.Client, contractAddr string) Subscriber {
 	}
 }
 
-type EventRx struct {
-	TxHash common.Hash
-	Action string
-}
 
-func (s Subscriber) ListenEvents(ctx context.Context, ch chan EventRx) error  {
+func (s Subscriber) ListenEvents(ctx context.Context, ch chan scanner.EventRx) error  {
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{s.contract},
 	}
@@ -54,7 +50,7 @@ func (s Subscriber) ListenEvents(ctx context.Context, ch chan EventRx) error  {
 			if err != nil {
 				return err
 			}
-			ch <- EventRx{
+			ch <- scanner.EventRx{
 				TxHash: vLog.TxHash,
 				Action: action,
 			}
