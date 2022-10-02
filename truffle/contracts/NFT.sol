@@ -12,7 +12,10 @@ contract NFT is ERC721Enumerable, Ownable {
     string public baseExtension = ".json";
     bool public paused = false;
 
-    constructor() ERC721("Net2Dev NFT Collection", "N2D") {
+    event NFTMint (uint256 indexed tokenId, address holder);
+    event NFTBurn (uint256 indexed tokenId, address holder);
+
+    constructor() ERC721("NFT Collection", "NCN") {
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
@@ -22,10 +25,12 @@ contract NFT is ERC721Enumerable, Ownable {
     
     function bridgeMint(address to, uint256 tokenId) public virtual onlyOwner() {
         _mint(to, tokenId);
+        emit NFTMint(tokenId, msg.sender);
     }
 
     function bridgeBurn(uint256 tokenId) public virtual onlyOwner() {
         _burn(tokenId);
+        emit NFTBurn(tokenId, msg.sender);
     }
 
     function walletOfOwner(address _owner)

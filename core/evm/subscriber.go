@@ -39,6 +39,7 @@ func (l Listener) Listen(ctx context.Context, ch chan event.Rx) error {
 	if err != nil {
 		return err
 	}
+	// TODO add NFT contract subscriber
 
 	for {
 		select {
