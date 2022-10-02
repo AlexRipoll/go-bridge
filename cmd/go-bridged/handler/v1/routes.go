@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"github.com/AlexRipoll/go-bridge/blockchain/config"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
+	"github.com/AlexRipoll/go-bridge/config"
+	"github.com/AlexRipoll/go-bridge/core/event"
 	"github.com/gorilla/mux"
 	"log"
 )
@@ -13,10 +13,10 @@ func Routes(config config.Config, router *mux.Router) {
 		log.Fatal(err)
 	}
 
-	ch := make(chan scanner.EventRx)
+	ch := make(chan event.Rx)
 
 	go h.CompleteTransfer(ch)
-	go RunEventListener(config, ch)
+	go RunEvmEventListener(config, ch)
 
 	// endpoints
 	router.HandleFunc("/wallets/{wallet_address}/tokens/{token_id}/transfer", h.Transfer).Methods("POST")

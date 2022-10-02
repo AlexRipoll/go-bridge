@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/AlexRipoll/go-bridge/blockchain/config"
-	"github.com/AlexRipoll/go-bridge/blockchain/core"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
+	"github.com/AlexRipoll/go-bridge/config"
+	"github.com/AlexRipoll/go-bridge/core"
+	"github.com/AlexRipoll/go-bridge/core/event"
+	evm2 "github.com/AlexRipoll/go-bridge/core/evm"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gorilla/mux"
 	"math/big"
@@ -20,8 +20,8 @@ type handler struct {
 }
 
 func NewHandler(config config.Config) (*handler, error) {
-	var custodian evm.Custodian
-	bridgers := make(map[string]evm.Bridger)
+	var custodian evm2.Custodian
+	bridgers := make(map[string]evm2.Bridger)
 
 	for name, network := range config.Networks {
 		conn, err := ethclient.Dial(network.Http)
@@ -31,12 +31,12 @@ func NewHandler(config config.Config) (*handler, error) {
 		for contract, address := range network.Contracts {
 			switch contract {
 			case "vault":
-				custodian, err = evm.NewCustodian(conn, address, config, name)
+				custodian, err = evm2.NewCustodian(conn, address, config, name)
 				if err != nil {
 					return nil, err
 				}
 			case "bridge":
-				bridger, err := evm.NewBridger(conn, address, config, name)
+				bridger, err := evm2.NewBridger(conn, address, config, name)
 				if err != nil {
 					return nil, err
 				}
@@ -55,10 +55,10 @@ func NewHandler(config config.Config) (*handler, error) {
 	return &handler{bridge: bridgeSrv}, nil
 }
 
-func (h handler) Transfer(w http.ResponseWriter, r *http.Request)  {
+func (h handler) Transfer(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		Destination string `json:"destination"`
-		Origin string `json:"origin"`
+		Origin      string `json:"origin"`
 	}
 
 	vars := mux.Vars(r)
@@ -82,6 +82,6 @@ func (h handler) Transfer(w http.ResponseWriter, r *http.Request)  {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h handler) CompleteTransfer(ch chan scanner.EventRx) error {
+func (h handler) CompleteTransfer(ch chan event.Rx) error {
 	return h.bridge.CompleteTransfer(context.Background(), ch)
 }

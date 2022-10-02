@@ -1,6 +1,7 @@
 package evm
 
 import (
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"math/big"
@@ -8,8 +9,9 @@ import (
 
 type NftCustodyEvent struct {
 	TokenId *big.Int
-	Holder	common.Address
+	Holder  common.Address
 }
 
-var nftCustodySig = []byte("NFTCustody(uint256,address)")
+var nftCustodyEventName = "NFTCustody"
+var nftCustodySig = []byte(fmt.Sprintf("%s(uint256,address)", nftCustodyEventName))
 var nftCustodySigHash = crypto.Keccak256Hash(nftCustodySig)

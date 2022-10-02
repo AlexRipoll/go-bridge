@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	Host          string
 	PrivateKey    string
 	WalletAddress string
 	GasLimit      uint64
@@ -14,10 +15,11 @@ type Config struct {
 }
 
 type Network struct {
-	Http string
-	Ws string
-	Type string
-	Contracts map[string]string
+	Http          string
+	Ws            string
+	Type          string
+	BlockFinality uint
+	Contracts     map[string]string
 }
 
 func Load() (Config, error) {

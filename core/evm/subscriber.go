@@ -3,8 +3,8 @@ package evm
 import (
 	"context"
 	"fmt"
-	"github.com/AlexRipoll/go-bridge/blockchain/contract"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
+	"github.com/AlexRipoll/go-bridge/contract"
+	"github.com/AlexRipoll/go-bridge/core/event"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -15,27 +15,27 @@ import (
 	"time"
 )
 
-type Subscriber struct {
-	conn *ethclient.Client
+type Listener struct {
+	conn     *ethclient.Client
 	contract common.Address
+	finality uint64
 }
 
-func NewSubscriber(client *ethclient.Client, contractAddr string) Subscriber {
-
-	return Subscriber{
-		conn:    client,
+func NewListener(client *ethclient.Client, contractAddr string, blockFinality uint) Listener {
+	return Listener{
+		conn:     client,
 		contract: common.HexToAddress(contractAddr),
+		finality: uint64(blockFinality),
 	}
 }
 
-
-func (s Subscriber) ListenEvents(ctx context.Context, ch chan scanner.EventRx) error  {
+func (l Listener) Listen(ctx context.Context, ch chan event.Rx) error {
 	query := ethereum.FilterQuery{
-		Addresses: []common.Address{s.contract},
+		Addresses: []common.Address{l.contract},
 	}
 
 	logs := make(chan types.Log)
-	sub, err := s.conn.SubscribeFilterLogs(ctx, query, logs)
+	sub, err := l.conn.SubscribeFilterLogs(ctx, query, logs)
 	if err != nil {
 		return err
 	}
@@ -46,11 +46,11 @@ func (s Subscriber) ListenEvents(ctx context.Context, ch chan scanner.EventRx) e
 			return err
 		case vLog := <-logs:
 			// TODO DIGEST IS BLOCKING THE EVENT SUBSCRIPTION | THINK IF SECURITY MARGIN SHOULD BE DONE ELSEWHERE
-			action, err := s.digestEvent(ctx, vLog)
+			action, err := l.digestEvent(ctx, vLog)
 			if err != nil {
 				return err
 			}
-			ch <- scanner.EventRx{
+			ch <- event.Rx{
 				TxHash: vLog.TxHash,
 				Action: action,
 			}
@@ -58,8 +58,7 @@ func (s Subscriber) ListenEvents(ctx context.Context, ch chan scanner.EventRx) e
 	}
 }
 
-
-func (s Subscriber) digestEvent(ctx context.Context, vLog types.Log) (string, error) {
+func (l Listener) digestEvent(ctx context.Context, vLog types.Log) (string, error) {
 	switch vLog.Topics[0].Hex() {
 	case nftCustodySigHash.Hex():
 		contractAbi, err := abi.JSON(strings.NewReader(string(contract.CustosialVaultMetaData.ABI)))
@@ -67,22 +66,23 @@ func (s Subscriber) digestEvent(ctx context.Context, vLog types.Log) (string, er
 			return "", err
 		}
 
+		// TODO rework SC and add remaining events
 		var nftCustody NftCustodyEvent
-		err = contractAbi.UnpackIntoInterface(&nftCustody, "NFTCustody", vLog.Data)
+		err = contractAbi.UnpackIntoInterface(&nftCustody, nftCustodyEventName, vLog.Data)
 		if err != nil {
 			return "", err
 		}
 		nftCustody.TokenId = big.NewInt(vLog.Topics[1].Big().Int64())
 
+		// TODO make it non blocking
 		for {
-			currentBlock, err := s.conn.BlockNumber(context.Background())
+			currentBlock, err := l.conn.BlockNumber(context.Background())
 			if err != nil {
 				return "", err
 			}
 
-			// TODO mint/burn/release token
-			if currentBlock - vLog.BlockNumber >= 50 {
-				return "mint", nil
+			if currentBlock-vLog.BlockNumber >= l.finality {
+				return event.MintAction, nil
 			}
 			time.Sleep(time.Second * 5)
 		}

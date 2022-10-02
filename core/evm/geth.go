@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
-	"github.com/AlexRipoll/go-bridge/blockchain/config"
-	"github.com/AlexRipoll/go-bridge/blockchain/contract"
+	"github.com/AlexRipoll/go-bridge/config"
+	contract2 "github.com/AlexRipoll/go-bridge/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -44,7 +44,7 @@ type Deployer interface {
 
 type custodian struct {
 	Client
-	Contract *contract.CustosialVault
+	Contract *contract2.CustosialVault
 }
 
 func NewCustodian(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Custodian, error) {
@@ -53,9 +53,9 @@ func NewCustodian(conn *ethclient.Client, contractAddr string, config config.Con
 		return nil, err
 	}
 
-	var vault *contract.CustosialVault
+	var vault *contract2.CustosialVault
 	if contractAddr != "" {
-		vault, err = contract.NewCustosialVault(common.HexToAddress(contractAddr), conn)
+		vault, err = contract2.NewCustosialVault(common.HexToAddress(contractAddr), conn)
 		if err != nil {
 			return nil, err
 		}
@@ -69,7 +69,7 @@ func NewCustodian(conn *ethclient.Client, contractAddr string, config config.Con
 
 type bridger struct {
 	Client
-	Contract *contract.NFT
+	Contract *contract2.NFT
 }
 
 func NewBridger(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Bridger, error) {
@@ -78,9 +78,9 @@ func NewBridger(conn *ethclient.Client, contractAddr string, config config.Confi
 		return nil, err
 	}
 
-	var nft *contract.NFT
+	var nft *contract2.NFT
 	if contractAddr != "" {
-		nft, err = contract.NewNFT(common.HexToAddress(contractAddr), conn)
+		nft, err = contract2.NewNFT(common.HexToAddress(contractAddr), conn)
 		if err != nil {
 			return nil, err
 		}

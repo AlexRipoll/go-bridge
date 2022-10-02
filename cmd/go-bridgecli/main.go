@@ -4,9 +4,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/AlexRipoll/go-bridge/blockchain/config"
-	"github.com/AlexRipoll/go-bridge/blockchain/core"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
+	"github.com/AlexRipoll/go-bridge/config"
+	"github.com/AlexRipoll/go-bridge/core"
+	evm2 "github.com/AlexRipoll/go-bridge/core/evm"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/pkg/errors"
 	"log"
@@ -25,8 +25,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var custodian evm.Custodian
-	bridgers := make(map[string]evm.Bridger)
+	var custodian evm2.Custodian
+	bridgers := make(map[string]evm2.Bridger)
 	for name, network := range config.Networks {
 		conn, err := ethclient.Dial(network.Http)
 		if err != nil {
@@ -35,12 +35,12 @@ func main() {
 		for contract, address := range network.Contracts {
 			switch contract {
 			case "vault":
-				custodian, err = evm.NewCustodian(conn, address, config, name)
+				custodian, err = evm2.NewCustodian(conn, address, config, name)
 				if err != nil {
 					log.Fatal(err)
 				}
 			case "bridge":
-				bridger, err := evm.NewBridger(conn, address, config, name)
+				bridger, err := evm2.NewBridger(conn, address, config, name)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -67,13 +67,13 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			minter, err := evm.NewBridger(conn, network.Contracts["bridge"], config, networkName)
+			minter, err := evm2.NewBridger(conn, network.Contracts["bridge"], config, networkName)
 			if err != nil {
 				log.Fatal(err)
 			}
 			bridgers[networkName] = minter
 
-			tx, err := minter.Mint(context.Background(), walletAddr, big.NewInt(6) )
+			tx, err := minter.Mint(context.Background(), walletAddr, big.NewInt(6))
 			if err != nil {
 				log.Fatal(" error minting token: ", err)
 			}
@@ -88,7 +88,7 @@ func main() {
 				log.Fatal(err)
 			}
 
-			err =bridge.TransferNFT(context.Background(), destinationBlockchain, originBlockchain, walletAddr, big.NewInt(int64(tokenId)))
+			err = bridge.TransferNFT(context.Background(), destinationBlockchain, originBlockchain, walletAddr, big.NewInt(int64(tokenId)))
 			if err != nil {
 				log.Fatal(" error transferring token: ", err)
 			}

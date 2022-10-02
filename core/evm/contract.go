@@ -2,7 +2,7 @@ package evm
 
 import (
 	"context"
-	"github.com/AlexRipoll/go-bridge/blockchain/contract"
+	contract2 "github.com/AlexRipoll/go-bridge/contract"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -154,7 +154,7 @@ func (c custodian) Deploy(ctx context.Context) ([]DeployRx, error) {
 	log.Printf("deploying contract on %s network", c.network)
 
 	var deployRxs []DeployRx
-	address, tx, _, err := contract.DeployNFT(transactor, c.conn)
+	address, tx, _, err := contract2.DeployNFT(transactor, c.conn)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (c custodian) Deploy(ctx context.Context) ([]DeployRx, error) {
 	}
 	transactor.Nonce = big.NewInt(int64(nonce))
 
-	address, tx, _, err = contract.DeployCustosialVault(transactor, c.conn, address)
+	address, tx, _, err = contract2.DeployCustosialVault(transactor, c.conn, address)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (b bridger) Deploy(ctx context.Context) ([]DeployRx, error) {
 	log.Printf("deploying contract on %s network", b.network)
 
 	var deployRxs []DeployRx
-	address, tx, _, err := contract.DeployNFT(transactor, b.conn)
+	address, tx, _, err := contract2.DeployNFT(transactor, b.conn)
 	if err != nil {
 		return nil, err
 	}

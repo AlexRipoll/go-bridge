@@ -5,60 +5,51 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/evm"
-	"github.com/AlexRipoll/go-bridge/blockchain/core/scanner"
-	"github.com/AlexRipoll/go-bridge/blockchain/sys/storage"
+	"github.com/AlexRipoll/go-bridge/core/event"
+	"github.com/AlexRipoll/go-bridge/core/evm"
+	"github.com/AlexRipoll/go-bridge/sys/storage"
 	"log"
 	"math/big"
 	"unsafe"
 )
 
-const (
-	MintAction = "mint"
-	BurnAction = "burn"
-	ReleaseAction = "release"
-)
-
 type Bridge struct {
 	mainNetwork string
-	custodian evm.Custodian
-	bridgers  map[string]evm.Bridger
-	storage storage.Storage
+	custodian   evm.Custodian
+	bridgers    map[string]evm.Bridger
+	storage     storage.Storage
 }
 
 func NewBridge(mainNetwork string, vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
 	return &Bridge{
 		mainNetwork: mainNetwork,
-		custodian: vault,
-		bridgers:  bridger,
+		custodian:   vault,
+		bridgers:    bridger,
 	}, nil
 }
 
 type Tx struct {
-	Hash string
-	Size float64
-	//From string
-	ChainID *big.Int
-	//Data      []byte
+	Hash      string
+	Size      float64
+	ChainID   *big.Int
 	Gas       uint64
 	GasPrice  *big.Int
 	GasTipCap *big.Int
 	GasFeeCap *big.Int
 	Value     *big.Int
 	Nonce     uint64
-	//To        string
 }
 
 type TxData struct {
-	Wallet string `json:"wallet"`
-	TokenId *big.Int `json:"token_id"`
-	Origin string `json:"origin"`
-	Destination string `json:"destination"`
+	Wallet      string   `json:"wallet"`
+	TokenId     *big.Int `json:"token_id"`
+	Origin      string   `json:"origin"`
+	Destination string   `json:"destination"`
 }
 
 // TransferNFT initiates the transfer of a token from one blockchain to another.
 // If from is the native blockchain, then the token is retained in the custody vault. Once the Tx event is received by
-// the Subscriber, it will be digested and the CompleteTransfer will be notified once the action needed can be
+// the Listener, it will be digested and the CompleteTransfer will be notified once the action needed can be
 // executed.
 // In case the token is transferred from a non-native blockchain to the native blockchain, the token copy will be burnt
 // and the token in the custody wallet will be released.
@@ -69,9 +60,9 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 		return errors.New("destination blockchain must be different than origin")
 	}
 
-	buf, err :=json.Marshal(TxData{
+	buf, err := json.Marshal(TxData{
 		Wallet:      walletAddress,
-		TokenId: tokenId,
+		TokenId:     tokenId,
 		Origin:      origin,
 		Destination: destination,
 	})
@@ -85,7 +76,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 			return err
 		}
 
-		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil {
 			return err
 		}
 		log.Printf("retain nft: %v", tx)
@@ -96,7 +87,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 		}
 		log.Printf("burn nft: %#v", tx)
 
-		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil {
 			return err
 		}
 		log.Printf("retain nft: %v", tx)
@@ -107,7 +98,7 @@ func (b Bridge) TransferNFT(ctx context.Context, destination, origin, walletAddr
 		}
 		log.Printf("burn nft: %#v", tx)
 
-		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil{
+		if err := b.storage.Put([]byte(tx.Hash), buf); err != nil {
 			return err
 		}
 		log.Printf("retain nft: %v", tx)
@@ -182,9 +173,9 @@ func (b Bridge) Deploy(ctx context.Context) error {
 	return nil
 }
 
-func (b Bridge) CompleteTransfer(ctx context.Context, ch chan scanner.EventRx) error {
+func (b Bridge) CompleteTransfer(ctx context.Context, ch chan event.Rx) error {
 	for {
-		eventRx := <- ch
+		eventRx := <-ch
 
 		buf, err := b.storage.Get([]byte(eventRx.TxHash.String()))
 		if err != nil {
@@ -197,19 +188,13 @@ func (b Bridge) CompleteTransfer(ctx context.Context, ch chan scanner.EventRx) e
 		}
 
 		switch eventRx.Action {
-		case MintAction:
+		case event.MintAction:
 			tx, err := b.bridgers[txData.Destination].Mint(ctx, txData.Wallet, txData.TokenId)
 			if err != nil {
 				return err
 			}
 			log.Println("Mint Tx: ", tx)
-		case BurnAction:
-			tx, err := b.bridgers[txData.Destination].Burn(ctx, txData.TokenId)
-			if err != nil {
-				return err
-			}
-			log.Println("Burn Tx: ", tx)
-		case ReleaseAction:
+		case event.ReleaseAction:
 			tx, err := b.custodian.ReleaseNFT(ctx, txData.Wallet, txData.TokenId)
 			if err != nil {
 				return err

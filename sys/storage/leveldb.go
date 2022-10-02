@@ -11,7 +11,7 @@ func NewLevelDB(path string) (*levelDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return 	&levelDB{db: db}, nil
+	return &levelDB{db: db}, nil
 }
 
 func (l levelDB) Close() {

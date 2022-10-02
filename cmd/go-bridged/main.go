@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/AlexRipoll/go-bridge/blockchain/config"
 	"github.com/AlexRipoll/go-bridge/cmd/go-bridged/handler"
+	"github.com/AlexRipoll/go-bridge/config"
 	"log"
 )
 
