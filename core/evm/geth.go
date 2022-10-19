@@ -14,17 +14,26 @@ import (
 )
 
 type Client struct {
-	config.Config
-	conn    *ethclient.Client
-	network string
+	conn       *ethclient.Client
+	chainId    uint64
+	contracts  Contracts
+	Transactor ContractTransactor
 }
 
-func NewClient(conn *ethclient.Client, config config.Config, network string) (*Client, error) {
+type Contracts struct {
+	custodianVault Custodian
+	erc721Token    Erc721Token
+}
+
+func NewClient(conn *ethclient.Client, custodialVaultAddress, erc721TokenAddress string) (*Client, error) {
+
 	return &Client{
-		Config:  config,
-		conn:    conn,
-		network: network,
+		conn: conn,
 	}, nil
+}
+
+type geth struct {
+	conn *ethclient.Client
 }
 
 type ContractTransactor interface {
@@ -36,10 +45,6 @@ type ContractTransactor interface {
 
 type Reader interface {
 	CurrentBlock(ctx context.Context) (uint64, error)
-}
-
-type Deployer interface {
-	Deploy(ctx context.Context) ([]DeployRx, error)
 }
 
 type custodian struct {
@@ -67,12 +72,7 @@ func NewCustodian(conn *ethclient.Client, contractAddr string, config config.Con
 	}, nil
 }
 
-type bridger struct {
-	Client
-	Contract *contract2.NFT
-}
-
-func NewBridger(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Bridger, error) {
+func NewBridger(conn *ethclient.Client, contractAddr string, config config.Config, network string) (Erc721Token, error) {
 	geth, err := NewClient(conn, config, network)
 	if err != nil {
 		return nil, err
@@ -91,12 +91,12 @@ func NewBridger(conn *ethclient.Client, contractAddr string, config config.Confi
 	}, nil
 }
 
-func (c Client) privateKey() (*ecdsa.PrivateKey, error) {
-	return crypto.HexToECDSA(c.PrivateKey)
+func (g geth) privateKey() (*ecdsa.PrivateKey, error) {
+	return crypto.HexToECDSA(g.PrivateKey)
 }
 
-func (c Client) Address() (common.Address, error) {
-	privateKey, err := c.privateKey()
+func (g geth) Address() (common.Address, error) {
+	privateKey, err := g.privateKey()
 	if err != nil {
 		return common.Address{}, err
 	}
@@ -112,43 +112,43 @@ func (c Client) Address() (common.Address, error) {
 	return address, nil
 }
 
-func (c Client) Nonce(ctx context.Context) (uint64, error) {
-	address, err := c.Address()
+func (g geth) Nonce(ctx context.Context) (uint64, error) {
+	address, err := g.Address()
 	if err != nil {
 		return 0, err
 	}
-	return c.conn.PendingNonceAt(ctx, address)
+	return g.conn.PendingNonceAt(ctx, address)
 }
 
-func (c Client) EstimatedGasPrice(ctx context.Context) (*big.Int, error) {
-	return c.conn.SuggestGasPrice(ctx)
+func (g geth) EstimatedGasPrice(ctx context.Context) (*big.Int, error) {
+	return g.conn.SuggestGasPrice(ctx)
 }
 
-func (c Client) ChainId(ctx context.Context) (*big.Int, error) {
-	return c.conn.ChainID(ctx)
+func (g geth) ChainId(ctx context.Context) (*big.Int, error) {
+	return g.conn.ChainID(ctx)
 }
 
-func (c Client) CurrentBlock(ctx context.Context) (uint64, error) {
-	return c.conn.BlockNumber(ctx)
+func (g geth) CurrentBlock(ctx context.Context) (uint64, error) {
+	return g.conn.BlockNumber(ctx)
 }
 
-func (c Client) prepareTransactor(ctx context.Context) (*bind.TransactOpts, error) {
-	privateKeyECDSA, err := c.privateKey()
+func (g geth) prepareTransactor(ctx context.Context) (*bind.TransactOpts, error) {
+	privateKeyECDSA, err := g.privateKey()
 	if err != nil {
 		return nil, err
 	}
 
-	chainId, err := c.ChainId(ctx)
+	chainId, err := g.ChainId(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	nonce, err := c.Nonce(ctx)
+	nonce, err := g.Nonce(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	gasPrice, err := c.EstimatedGasPrice(ctx)
+	gasPrice, err := g.EstimatedGasPrice(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -159,8 +159,22 @@ func (c Client) prepareTransactor(ctx context.Context) (*bind.TransactOpts, erro
 	}
 	transactor.Nonce = big.NewInt(int64(nonce))
 	transactor.Value = big.NewInt(0)
-	//transactor.GasLimit = c.GasLimit
+	//transactor.GasLimit = g.GasLimit
 	transactor.GasPrice = gasPrice
 
 	return transactor, nil
+}
+
+func (g geth) prepareCallOpts(ctx context.Context) (*bind.CallOpts, error) {
+	caller, err := g.Address()
+	if err != nil {
+		return nil, err
+	}
+
+	callOpts := bind.CallOpts{
+		From:        caller,
+		Context:     ctx,
+	}
+
+	return &callOpts, nil
 }

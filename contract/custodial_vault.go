@@ -30,8 +30,8 @@ var (
 
 // CustosialVaultMetaData contains all meta data concerning the CustosialVault contract.
 var CustosialVaultMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"contractERC721Enumerable\",\"name\":\"_nft\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"name\":\"NFTCustody\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"emergencyDelete\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"holdCustody\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"onERC721Received\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"wallet\",\"type\":\"address\"}],\"name\":\"releaseNFT\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"retainNFT\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"txCost\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"newHolder\",\"type\":\"address\"}],\"name\":\"updateOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}]",
-	Bin: "0x60806040526544364c5bb0006002553480156200001b57600080fd5b5060405162001531380380620015318339818101604052810190620000419190620001fd565b6001600081905550620000696200005d620000b160201b60201c565b620000b960201b60201c565b80600460006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550506200022f565b600033905090565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905081600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508173ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a35050565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000620001b18262000184565b9050919050565b6000620001c582620001a4565b9050919050565b620001d781620001b8565b8114620001e357600080fd5b50565b600081519050620001f781620001cc565b92915050565b6000602082840312156200021657620002156200017f565b5b60006200022684828501620001e6565b91505092915050565b6112f2806200023f6000396000f3fe60806040526004361061009b5760003560e01c80637192711f116100645780637192711f146101505780638da5cb5b14610179578063b2a7e29d146101a4578063ccf678d8146101cf578063dd39bd21146101eb578063f2fde38b146102295761009b565b8062d90cd9146100a0578063150b7a02146100c95780633ccfd60b1461010657806344509d3e14610110578063715018a614610139575b600080fd5b3480156100ac57600080fd5b506100c760048036038101906100c29190610c14565b610252565b005b3480156100d557600080fd5b506100f060048036038101906100eb9190610d04565b6102f7565b6040516100fd9190610dc7565b60405180910390f35b61010e61037a565b005b34801561011c57600080fd5b5061013760048036038101906101329190610de2565b6103c2565b005b34801561014557600080fd5b5061014e6104f9565b005b34801561015c57600080fd5b5061017760048036038101906101729190610de2565b61050d565b005b34801561018557600080fd5b5061018e610638565b60405161019b9190610e31565b60405180910390f35b3480156101b057600080fd5b506101b9610662565b6040516101c69190610e5b565b60405180910390f35b6101e960048036038101906101e49190610c14565b610668565b005b3480156101f757600080fd5b50610212600480360381019061020d9190610c14565b6109c1565b604051610220929190610e76565b60405180910390f35b34801561023557600080fd5b50610250600480360381019061024b9190610e9f565b610a05565b005b600260005403610297576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161028e90610f29565b60405180910390fd5b60026000819055506102a7610a88565b600360008281526020019081526020016000206000808201600090556001820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690555050600160008190555050565b60008073ffffffffffffffffffffffffffffffffffffffff168573ffffffffffffffffffffffffffffffffffffffff1614610367576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161035e90610f95565b60405180910390fd5b63150b7a0260e01b905095945050505050565b610382610a88565b3373ffffffffffffffffffffffffffffffffffffffff166108fc479081150290604051600060405180830381858888f193505050506103c057600080fd5b565b600260005403610407576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016103fe90610f29565b60405180910390fd5b6002600081905550610417610a88565b600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166323b872dd3083856040518463ffffffff1660e01b815260040161047693929190610fb5565b600060405180830381600087803b15801561049057600080fd5b505af11580156104a4573d6000803e3d6000fd5b50505050600360008381526020019081526020016000206000808201600090556001820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff0219169055505060016000819055505050565b610501610a88565b61050b6000610b06565b565b600260005403610552576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161054990610f29565b60405180910390fd5b6002600081905550610562610a88565b60405180604001604052808381526020018273ffffffffffffffffffffffffffffffffffffffff16815250600360008481526020019081526020016000206000820151816000015560208201518160010160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550905050817f2eae7534e9f0d5d8a801dd79515d22a9c36f0b691692ca20f5bc04b94b055edc826040516106249190610e31565b60405180910390a260016000819055505050565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60025481565b6002600054036106ad576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016106a490610f29565b60405180910390fd5b600260008190555060025434146106f9576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016106f09061105e565b60405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff16600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16636352211e836040518263ffffffff1660e01b815260040161076b9190610e5b565b602060405180830381865afa158015610788573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906107ac9190611093565b73ffffffffffffffffffffffffffffffffffffffff1614610802576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016107f990611132565b60405180910390fd5b600060036000838152602001908152602001600020600001541461085b576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016108529061119e565b60405180910390fd5b60405180604001604052808281526020013373ffffffffffffffffffffffffffffffffffffffff16815250600360008381526020019081526020016000206000820151816000015560208201518160010160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550905050600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166323b872dd3330846040518463ffffffff1660e01b815260040161094c93929190610fb5565b600060405180830381600087803b15801561096657600080fd5b505af115801561097a573d6000803e3d6000fd5b50505050807f2eae7534e9f0d5d8a801dd79515d22a9c36f0b691692ca20f5bc04b94b055edc336040516109ae9190610e31565b60405180910390a2600160008190555050565b60036020528060005260406000206000915090508060000154908060010160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905082565b610a0d610a88565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1603610a7c576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610a7390611230565b60405180910390fd5b610a8581610b06565b50565b610a90610bcc565b73ffffffffffffffffffffffffffffffffffffffff16610aae610638565b73ffffffffffffffffffffffffffffffffffffffff1614610b04576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610afb9061129c565b60405180910390fd5b565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905081600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508173ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a35050565b600033905090565b600080fd5b600080fd5b6000819050919050565b610bf181610bde565b8114610bfc57600080fd5b50565b600081359050610c0e81610be8565b92915050565b600060208284031215610c2a57610c29610bd4565b5b6000610c3884828501610bff565b91505092915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000610c6c82610c41565b9050919050565b610c7c81610c61565b8114610c8757600080fd5b50565b600081359050610c9981610c73565b92915050565b600080fd5b600080fd5b600080fd5b60008083601f840112610cc457610cc3610c9f565b5b8235905067ffffffffffffffff811115610ce157610ce0610ca4565b5b602083019150836001820283011115610cfd57610cfc610ca9565b5b9250929050565b600080600080600060808688031215610d2057610d1f610bd4565b5b6000610d2e88828901610c8a565b9550506020610d3f88828901610c8a565b9450506040610d5088828901610bff565b935050606086013567ffffffffffffffff811115610d7157610d70610bd9565b5b610d7d88828901610cae565b92509250509295509295909350565b60007fffffffff0000000000000000000000000000000000000000000000000000000082169050919050565b610dc181610d8c565b82525050565b6000602082019050610ddc6000830184610db8565b92915050565b60008060408385031215610df957610df8610bd4565b5b6000610e0785828601610bff565b9250506020610e1885828601610c8a565b9150509250929050565b610e2b81610c61565b82525050565b6000602082019050610e466000830184610e22565b92915050565b610e5581610bde565b82525050565b6000602082019050610e706000830184610e4c565b92915050565b6000604082019050610e8b6000830185610e4c565b610e986020830184610e22565b9392505050565b600060208284031215610eb557610eb4610bd4565b5b6000610ec384828501610c8a565b91505092915050565b600082825260208201905092915050565b7f5265656e7472616e637947756172643a207265656e7472616e742063616c6c00600082015250565b6000610f13601f83610ecc565b9150610f1e82610edd565b602082019050919050565b60006020820190508181036000830152610f4281610f06565b9050919050565b7f43616e6e6f742052656365697665204e465473204469726563746c7900000000600082015250565b6000610f7f601c83610ecc565b9150610f8a82610f49565b602082019050919050565b60006020820190508181036000830152610fae81610f72565b9050919050565b6000606082019050610fca6000830186610e22565b610fd76020830185610e22565b610fe46040830184610e4c565b949350505050565b7f4e6f7420656e6f7567682062616c616e636520746f20636f6d706c657465207460008201527f72616e73616374696f6e2e000000000000000000000000000000000000000000602082015250565b6000611048602b83610ecc565b915061105382610fec565b604082019050919050565b600060208201905081810360008301526110778161103b565b9050919050565b60008151905061108d81610c73565b92915050565b6000602082840312156110a9576110a8610bd4565b5b60006110b78482850161107e565b91505092915050565b7f796f75206d75737420626520746865204e4654206f776e657220666f7220657860008201527f65637574696e67207468697320616374696f6e00000000000000000000000000602082015250565b600061111c603383610ecc565b9150611127826110c0565b604082019050919050565b6000602082019050818103600083015261114b8161110f565b9050919050565b7f4e465420616c72656164792073746f7265640000000000000000000000000000600082015250565b6000611188601283610ecc565b915061119382611152565b602082019050919050565b600060208201905081810360008301526111b78161117b565b9050919050565b7f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160008201527f6464726573730000000000000000000000000000000000000000000000000000602082015250565b600061121a602683610ecc565b9150611225826111be565b604082019050919050565b600060208201905081810360008301526112498161120d565b9050919050565b7f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572600082015250565b6000611286602083610ecc565b915061129182611250565b602082019050919050565b600060208201905081810360008301526112b581611279565b905091905056fea2646970667358221220b226d5e7c5e7cff59ee300e312d6c41a2d1ae437d316ed8a8b076f3189b94d8264736f6c63430008100033",
+	ABI: "[{\"inputs\":[{\"internalType\":\"contractERC721Enumerable\",\"name\":\"_erc721token\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"holder\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"destinationChainId\",\"type\":\"uint256\"}],\"name\":\"TokenCustody\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"}],\"name\":\"emergencyDelete\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"holdCustody\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"onERC721Received\",\"outputs\":[{\"internalType\":\"bytes4\",\"name\":\"\",\"type\":\"bytes4\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"wallet\",\"type\":\"address\"}],\"name\":\"releaseToken\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"destination\",\"type\":\"uint256\"}],\"name\":\"retainToken\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"txCost\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"tokenId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"newHolder\",\"type\":\"address\"}],\"name\":\"updateOwner\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}]",
+	Bin: "0x60806040526103e86002553480156200001757600080fd5b506040516200156c3803806200156c83398181016040528101906200003d9190620001f9565b60016000819055506200006562000059620000ad60201b60201c565b620000b560201b60201c565b80600460006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550506200022b565b600033905090565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905081600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508173ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a35050565b600080fd5b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000620001ad8262000180565b9050919050565b6000620001c182620001a0565b9050919050565b620001d381620001b4565b8114620001df57600080fd5b50565b600081519050620001f381620001c8565b92915050565b6000602082840312156200021257620002116200017b565b5b60006200022284828501620001e2565b91505092915050565b611331806200023b6000396000f3fe60806040526004361061009b5760003560e01c80637192711f116100645780637192711f146101505780638da5cb5b14610179578063982ebbb9146101a4578063b2a7e29d146101c0578063dd39bd21146101eb578063f2fde38b146102285761009b565b8062d90cd9146100a0578063050ed154146100c9578063150b7a02146100f25780633ccfd60b1461012f578063715018a614610139575b600080fd5b3480156100ac57600080fd5b506100c760048036038101906100c29190610c13565b610251565b005b3480156100d557600080fd5b506100f060048036038101906100eb9190610c9e565b6102e7565b005b3480156100fe57600080fd5b5061011960048036038101906101149190610d43565b61040f565b6040516101269190610e06565b60405180910390f35b610137610492565b005b34801561014557600080fd5b5061014e6104da565b005b34801561015c57600080fd5b5061017760048036038101906101729190610c9e565b6104ee565b005b34801561018557600080fd5b5061018e6105a1565b60405161019b9190610e30565b60405180910390f35b6101be60048036038101906101b99190610e4b565b6105cb565b005b3480156101cc57600080fd5b506101d56109cb565b6040516101e29190610e9a565b60405180910390f35b3480156101f757600080fd5b50610212600480360381019061020d9190610c13565b6109d1565b60405161021f9190610e30565b60405180910390f35b34801561023457600080fd5b5061024f600480360381019061024a9190610eb5565b610a04565b005b600260005403610296576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161028d90610f3f565b60405180910390fd5b60026000819055506102a6610a87565b6003600082815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff0219169055600160008190555050565b60026000540361032c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161032390610f3f565b60405180910390fd5b600260008190555061033c610a87565b600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166323b872dd3083856040518463ffffffff1660e01b815260040161039b93929190610f5f565b600060405180830381600087803b1580156103b557600080fd5b505af11580156103c9573d6000803e3d6000fd5b505050506003600083815260200190815260200160002060006101000a81549073ffffffffffffffffffffffffffffffffffffffff021916905560016000819055505050565b60008073ffffffffffffffffffffffffffffffffffffffff168573ffffffffffffffffffffffffffffffffffffffff161461047f576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161047690610fe2565b60405180910390fd5b63150b7a0260e01b905095945050505050565b61049a610a87565b3373ffffffffffffffffffffffffffffffffffffffff166108fc479081150290604051600060405180830381858888f193505050506104d857600080fd5b565b6104e2610a87565b6104ec6000610b05565b565b600260005403610533576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161052a90610f3f565b60405180910390fd5b6002600081905550610543610a87565b806003600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060016000819055505050565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b600260005403610610576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161060790610f3f565b60405180910390fd5b6002600081905550600254341461065c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161065390611074565b60405180910390fd5b3373ffffffffffffffffffffffffffffffffffffffff16600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16636352211e846040518263ffffffff1660e01b81526004016106ce9190610e9a565b602060405180830381865afa1580156106eb573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061070f91906110a9565b73ffffffffffffffffffffffffffffffffffffffff1614610765576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161075c90611148565b60405180910390fd5b600073ffffffffffffffffffffffffffffffffffffffff166003600084815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614610807576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016107fe906111b4565b60405180910390fd5b336003600084815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166323b872dd600460009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16636352211e856040518263ffffffff1660e01b81526004016108f29190610e9a565b602060405180830381865afa15801561090f573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061093391906110a9565b30856040518463ffffffff1660e01b815260040161095393929190610f5f565b600060405180830381600087803b15801561096d57600080fd5b505af1158015610981573d6000803e3d6000fd5b50505050817f9bea55fe89520950ade3cb8f5b298d336f4ee0eca04a544b1b0760c40b4423b533836040516109b79291906111d4565b60405180910390a260016000819055505050565b60025481565b60036020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b610a0c610a87565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1603610a7b576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610a729061126f565b60405180910390fd5b610a8481610b05565b50565b610a8f610bcb565b73ffffffffffffffffffffffffffffffffffffffff16610aad6105a1565b73ffffffffffffffffffffffffffffffffffffffff1614610b03576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610afa906112db565b60405180910390fd5b565b6000600160009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905081600160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508173ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a35050565b600033905090565b600080fd5b600080fd5b6000819050919050565b610bf081610bdd565b8114610bfb57600080fd5b50565b600081359050610c0d81610be7565b92915050565b600060208284031215610c2957610c28610bd3565b5b6000610c3784828501610bfe565b91505092915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b6000610c6b82610c40565b9050919050565b610c7b81610c60565b8114610c8657600080fd5b50565b600081359050610c9881610c72565b92915050565b60008060408385031215610cb557610cb4610bd3565b5b6000610cc385828601610bfe565b9250506020610cd485828601610c89565b9150509250929050565b600080fd5b600080fd5b600080fd5b60008083601f840112610d0357610d02610cde565b5b8235905067ffffffffffffffff811115610d2057610d1f610ce3565b5b602083019150836001820283011115610d3c57610d3b610ce8565b5b9250929050565b600080600080600060808688031215610d5f57610d5e610bd3565b5b6000610d6d88828901610c89565b9550506020610d7e88828901610c89565b9450506040610d8f88828901610bfe565b935050606086013567ffffffffffffffff811115610db057610daf610bd8565b5b610dbc88828901610ced565b92509250509295509295909350565b60007fffffffff0000000000000000000000000000000000000000000000000000000082169050919050565b610e0081610dcb565b82525050565b6000602082019050610e1b6000830184610df7565b92915050565b610e2a81610c60565b82525050565b6000602082019050610e456000830184610e21565b92915050565b60008060408385031215610e6257610e61610bd3565b5b6000610e7085828601610bfe565b9250506020610e8185828601610bfe565b9150509250929050565b610e9481610bdd565b82525050565b6000602082019050610eaf6000830184610e8b565b92915050565b600060208284031215610ecb57610eca610bd3565b5b6000610ed984828501610c89565b91505092915050565b600082825260208201905092915050565b7f5265656e7472616e637947756172643a207265656e7472616e742063616c6c00600082015250565b6000610f29601f83610ee2565b9150610f3482610ef3565b602082019050919050565b60006020820190508181036000830152610f5881610f1c565b9050919050565b6000606082019050610f746000830186610e21565b610f816020830185610e21565b610f8e6040830184610e8b565b949350505050565b7f43616e6e6f74205265636569766520546f6b656e73204469726563746c790000600082015250565b6000610fcc601e83610ee2565b9150610fd782610f96565b602082019050919050565b60006020820190508181036000830152610ffb81610fbf565b9050919050565b7f4e6f7420656e6f7567682062616c616e636520746f20636f6d706c657465207460008201527f72616e73616374696f6e2e000000000000000000000000000000000000000000602082015250565b600061105e602b83610ee2565b915061106982611002565b604082019050919050565b6000602082019050818103600083015261108d81611051565b9050919050565b6000815190506110a381610c72565b92915050565b6000602082840312156110bf576110be610bd3565b5b60006110cd84828501611094565b91505092915050565b7f796f75206d7573742062652074686520546f6b656e206f776e657220666f722060008201527f657865637574696e67207468697320616374696f6e0000000000000000000000602082015250565b6000611132603583610ee2565b915061113d826110d6565b604082019050919050565b6000602082019050818103600083015261116181611125565b9050919050565b7f546f6b656e20616c72656164792073746f726564000000000000000000000000600082015250565b600061119e601483610ee2565b91506111a982611168565b602082019050919050565b600060208201905081810360008301526111cd81611191565b9050919050565b60006040820190506111e96000830185610e21565b6111f66020830184610e8b565b9392505050565b7f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160008201527f6464726573730000000000000000000000000000000000000000000000000000602082015250565b6000611259602683610ee2565b9150611264826111fd565b604082019050919050565b600060208201905081810360008301526112888161124c565b9050919050565b7f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572600082015250565b60006112c5602083610ee2565b91506112d08261128f565b602082019050919050565b600060208201905081810360008301526112f4816112b8565b905091905056fea2646970667358221220a0c7b668129381d7f5c26f150c9521e9778b74307a0d0151683196365ece1fce64736f6c63430008110033",
 }
 
 // CustosialVaultABI is the input ABI used to generate the binding from.
@@ -43,7 +43,7 @@ var CustosialVaultABI = CustosialVaultMetaData.ABI
 var CustosialVaultBin = CustosialVaultMetaData.Bin
 
 // DeployCustosialVault deploys a new Ethereum contract, binding an instance of CustosialVault to it.
-func DeployCustosialVault(auth *bind.TransactOpts, backend bind.ContractBackend, _nft common.Address) (common.Address, *types.Transaction, *CustosialVault, error) {
+func DeployCustosialVault(auth *bind.TransactOpts, backend bind.ContractBackend, _erc721token common.Address) (common.Address, *types.Transaction, *CustosialVault, error) {
 	parsed, err := CustosialVaultMetaData.GetAbi()
 	if err != nil {
 		return common.Address{}, nil, nil, err
@@ -52,7 +52,7 @@ func DeployCustosialVault(auth *bind.TransactOpts, backend bind.ContractBackend,
 		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
 	}
 
-	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(CustosialVaultBin), backend, _nft)
+	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(CustosialVaultBin), backend, _erc721token)
 	if err != nil {
 		return common.Address{}, nil, nil, err
 	}
@@ -203,46 +203,32 @@ func (_CustosialVault *CustosialVaultTransactorRaw) Transact(opts *bind.Transact
 
 // HoldCustody is a free data retrieval call binding the contract method 0xdd39bd21.
 //
-// Solidity: function holdCustody(uint256 ) view returns(uint256 tokenId, address holder)
-func (_CustosialVault *CustosialVaultCaller) HoldCustody(opts *bind.CallOpts, arg0 *big.Int) (struct {
-	TokenId *big.Int
-	Holder  common.Address
-}, error) {
+// Solidity: function holdCustody(uint256 ) view returns(address)
+func (_CustosialVault *CustosialVaultCaller) HoldCustody(opts *bind.CallOpts, arg0 *big.Int) (common.Address, error) {
 	var out []interface{}
 	err := _CustosialVault.contract.Call(opts, &out, "holdCustody", arg0)
 
-	outstruct := new(struct {
-		TokenId *big.Int
-		Holder  common.Address
-	})
 	if err != nil {
-		return *outstruct, err
+		return *new(common.Address), err
 	}
 
-	outstruct.TokenId = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
-	outstruct.Holder = *abi.ConvertType(out[1], new(common.Address)).(*common.Address)
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
 
-	return *outstruct, err
+	return out0, err
 
 }
 
 // HoldCustody is a free data retrieval call binding the contract method 0xdd39bd21.
 //
-// Solidity: function holdCustody(uint256 ) view returns(uint256 tokenId, address holder)
-func (_CustosialVault *CustosialVaultSession) HoldCustody(arg0 *big.Int) (struct {
-	TokenId *big.Int
-	Holder  common.Address
-}, error) {
+// Solidity: function holdCustody(uint256 ) view returns(address)
+func (_CustosialVault *CustosialVaultSession) HoldCustody(arg0 *big.Int) (common.Address, error) {
 	return _CustosialVault.Contract.HoldCustody(&_CustosialVault.CallOpts, arg0)
 }
 
 // HoldCustody is a free data retrieval call binding the contract method 0xdd39bd21.
 //
-// Solidity: function holdCustody(uint256 ) view returns(uint256 tokenId, address holder)
-func (_CustosialVault *CustosialVaultCallerSession) HoldCustody(arg0 *big.Int) (struct {
-	TokenId *big.Int
-	Holder  common.Address
-}, error) {
+// Solidity: function holdCustody(uint256 ) view returns(address)
+func (_CustosialVault *CustosialVaultCallerSession) HoldCustody(arg0 *big.Int) (common.Address, error) {
 	return _CustosialVault.Contract.HoldCustody(&_CustosialVault.CallOpts, arg0)
 }
 
@@ -360,25 +346,25 @@ func (_CustosialVault *CustosialVaultTransactorSession) EmergencyDelete(tokenId 
 	return _CustosialVault.Contract.EmergencyDelete(&_CustosialVault.TransactOpts, tokenId)
 }
 
-// ReleaseNFT is a paid mutator transaction binding the contract method 0x44509d3e.
+// ReleaseToken is a paid mutator transaction binding the contract method 0x050ed154.
 //
-// Solidity: function releaseNFT(uint256 tokenId, address wallet) returns()
-func (_CustosialVault *CustosialVaultTransactor) ReleaseNFT(opts *bind.TransactOpts, tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
-	return _CustosialVault.contract.Transact(opts, "releaseNFT", tokenId, wallet)
+// Solidity: function releaseToken(uint256 tokenId, address wallet) returns()
+func (_CustosialVault *CustosialVaultTransactor) ReleaseToken(opts *bind.TransactOpts, tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
+	return _CustosialVault.contract.Transact(opts, "releaseToken", tokenId, wallet)
 }
 
-// ReleaseNFT is a paid mutator transaction binding the contract method 0x44509d3e.
+// ReleaseToken is a paid mutator transaction binding the contract method 0x050ed154.
 //
-// Solidity: function releaseNFT(uint256 tokenId, address wallet) returns()
-func (_CustosialVault *CustosialVaultSession) ReleaseNFT(tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
-	return _CustosialVault.Contract.ReleaseNFT(&_CustosialVault.TransactOpts, tokenId, wallet)
+// Solidity: function releaseToken(uint256 tokenId, address wallet) returns()
+func (_CustosialVault *CustosialVaultSession) ReleaseToken(tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
+	return _CustosialVault.Contract.ReleaseToken(&_CustosialVault.TransactOpts, tokenId, wallet)
 }
 
-// ReleaseNFT is a paid mutator transaction binding the contract method 0x44509d3e.
+// ReleaseToken is a paid mutator transaction binding the contract method 0x050ed154.
 //
-// Solidity: function releaseNFT(uint256 tokenId, address wallet) returns()
-func (_CustosialVault *CustosialVaultTransactorSession) ReleaseNFT(tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
-	return _CustosialVault.Contract.ReleaseNFT(&_CustosialVault.TransactOpts, tokenId, wallet)
+// Solidity: function releaseToken(uint256 tokenId, address wallet) returns()
+func (_CustosialVault *CustosialVaultTransactorSession) ReleaseToken(tokenId *big.Int, wallet common.Address) (*types.Transaction, error) {
+	return _CustosialVault.Contract.ReleaseToken(&_CustosialVault.TransactOpts, tokenId, wallet)
 }
 
 // RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
@@ -402,25 +388,25 @@ func (_CustosialVault *CustosialVaultTransactorSession) RenounceOwnership() (*ty
 	return _CustosialVault.Contract.RenounceOwnership(&_CustosialVault.TransactOpts)
 }
 
-// RetainNFT is a paid mutator transaction binding the contract method 0xccf678d8.
+// RetainToken is a paid mutator transaction binding the contract method 0x982ebbb9.
 //
-// Solidity: function retainNFT(uint256 tokenId) payable returns()
-func (_CustosialVault *CustosialVaultTransactor) RetainNFT(opts *bind.TransactOpts, tokenId *big.Int) (*types.Transaction, error) {
-	return _CustosialVault.contract.Transact(opts, "retainNFT", tokenId)
+// Solidity: function retainToken(uint256 tokenId, uint256 destination) payable returns()
+func (_CustosialVault *CustosialVaultTransactor) RetainToken(opts *bind.TransactOpts, tokenId *big.Int, destination *big.Int) (*types.Transaction, error) {
+	return _CustosialVault.contract.Transact(opts, "retainToken", tokenId, destination)
 }
 
-// RetainNFT is a paid mutator transaction binding the contract method 0xccf678d8.
+// RetainToken is a paid mutator transaction binding the contract method 0x982ebbb9.
 //
-// Solidity: function retainNFT(uint256 tokenId) payable returns()
-func (_CustosialVault *CustosialVaultSession) RetainNFT(tokenId *big.Int) (*types.Transaction, error) {
-	return _CustosialVault.Contract.RetainNFT(&_CustosialVault.TransactOpts, tokenId)
+// Solidity: function retainToken(uint256 tokenId, uint256 destination) payable returns()
+func (_CustosialVault *CustosialVaultSession) RetainToken(tokenId *big.Int, destination *big.Int) (*types.Transaction, error) {
+	return _CustosialVault.Contract.RetainToken(&_CustosialVault.TransactOpts, tokenId, destination)
 }
 
-// RetainNFT is a paid mutator transaction binding the contract method 0xccf678d8.
+// RetainToken is a paid mutator transaction binding the contract method 0x982ebbb9.
 //
-// Solidity: function retainNFT(uint256 tokenId) payable returns()
-func (_CustosialVault *CustosialVaultTransactorSession) RetainNFT(tokenId *big.Int) (*types.Transaction, error) {
-	return _CustosialVault.Contract.RetainNFT(&_CustosialVault.TransactOpts, tokenId)
+// Solidity: function retainToken(uint256 tokenId, uint256 destination) payable returns()
+func (_CustosialVault *CustosialVaultTransactorSession) RetainToken(tokenId *big.Int, destination *big.Int) (*types.Transaction, error) {
+	return _CustosialVault.Contract.RetainToken(&_CustosialVault.TransactOpts, tokenId, destination)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
@@ -484,151 +470,6 @@ func (_CustosialVault *CustosialVaultSession) Withdraw() (*types.Transaction, er
 // Solidity: function withdraw() payable returns()
 func (_CustosialVault *CustosialVaultTransactorSession) Withdraw() (*types.Transaction, error) {
 	return _CustosialVault.Contract.Withdraw(&_CustosialVault.TransactOpts)
-}
-
-// CustosialVaultNFTCustodyIterator is returned from FilterNFTCustody and is used to iterate over the raw logs and unpacked data for NFTCustody events raised by the CustosialVault contract.
-type CustosialVaultNFTCustodyIterator struct {
-	Event *CustosialVaultNFTCustody // Event containing the contract specifics and raw log
-
-	contract *bind.BoundContract // Generic contract to use for unpacking event data
-	event    string              // Event name to use for unpacking event data
-
-	logs chan types.Log        // Log channel receiving the found contract events
-	sub  ethereum.Subscription // Subscription for errors, completion and termination
-	done bool                  // Whether the subscription completed delivering logs
-	fail error                 // Occurred error to stop iteration
-}
-
-// Next advances the iterator to the subsequent event, returning whether there
-// are any more events found. In case of a retrieval or parsing error, false is
-// returned and Error() can be queried for the exact failure.
-func (it *CustosialVaultNFTCustodyIterator) Next() bool {
-	// If the iterator failed, stop iterating
-	if it.fail != nil {
-		return false
-	}
-	// If the iterator completed, deliver directly whatever's available
-	if it.done {
-		select {
-		case log := <-it.logs:
-			it.Event = new(CustosialVaultNFTCustody)
-			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-				it.fail = err
-				return false
-			}
-			it.Event.Raw = log
-			return true
-
-		default:
-			return false
-		}
-	}
-	// Iterator still in progress, wait for either a data or an error event
-	select {
-	case log := <-it.logs:
-		it.Event = new(CustosialVaultNFTCustody)
-		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
-			it.fail = err
-			return false
-		}
-		it.Event.Raw = log
-		return true
-
-	case err := <-it.sub.Err():
-		it.done = true
-		it.fail = err
-		return it.Next()
-	}
-}
-
-// Error returns any retrieval or parsing error occurred during filtering.
-func (it *CustosialVaultNFTCustodyIterator) Error() error {
-	return it.fail
-}
-
-// Close terminates the iteration process, releasing any pending underlying
-// resources.
-func (it *CustosialVaultNFTCustodyIterator) Close() error {
-	it.sub.Unsubscribe()
-	return nil
-}
-
-// CustosialVaultNFTCustody represents a NFTCustody event raised by the CustosialVault contract.
-type CustosialVaultNFTCustody struct {
-	TokenId *big.Int
-	Holder  common.Address
-	Raw     types.Log // Blockchain specific contextual infos
-}
-
-// FilterNFTCustody is a free log retrieval operation binding the contract event 0x2eae7534e9f0d5d8a801dd79515d22a9c36f0b691692ca20f5bc04b94b055edc.
-//
-// Solidity: event NFTCustody(uint256 indexed tokenId, address holder)
-func (_CustosialVault *CustosialVaultFilterer) FilterNFTCustody(opts *bind.FilterOpts, tokenId []*big.Int) (*CustosialVaultNFTCustodyIterator, error) {
-
-	var tokenIdRule []interface{}
-	for _, tokenIdItem := range tokenId {
-		tokenIdRule = append(tokenIdRule, tokenIdItem)
-	}
-
-	logs, sub, err := _CustosialVault.contract.FilterLogs(opts, "NFTCustody", tokenIdRule)
-	if err != nil {
-		return nil, err
-	}
-	return &CustosialVaultNFTCustodyIterator{contract: _CustosialVault.contract, event: "NFTCustody", logs: logs, sub: sub}, nil
-}
-
-// WatchNFTCustody is a free log subscription operation binding the contract event 0x2eae7534e9f0d5d8a801dd79515d22a9c36f0b691692ca20f5bc04b94b055edc.
-//
-// Solidity: event NFTCustody(uint256 indexed tokenId, address holder)
-func (_CustosialVault *CustosialVaultFilterer) WatchNFTCustody(opts *bind.WatchOpts, sink chan<- *CustosialVaultNFTCustody, tokenId []*big.Int) (event.Subscription, error) {
-
-	var tokenIdRule []interface{}
-	for _, tokenIdItem := range tokenId {
-		tokenIdRule = append(tokenIdRule, tokenIdItem)
-	}
-
-	logs, sub, err := _CustosialVault.contract.WatchLogs(opts, "NFTCustody", tokenIdRule)
-	if err != nil {
-		return nil, err
-	}
-	return event.NewSubscription(func(quit <-chan struct{}) error {
-		defer sub.Unsubscribe()
-		for {
-			select {
-			case log := <-logs:
-				// New log arrived, parse the event and forward to the user
-				event := new(CustosialVaultNFTCustody)
-				if err := _CustosialVault.contract.UnpackLog(event, "NFTCustody", log); err != nil {
-					return err
-				}
-				event.Raw = log
-
-				select {
-				case sink <- event:
-				case err := <-sub.Err():
-					return err
-				case <-quit:
-					return nil
-				}
-			case err := <-sub.Err():
-				return err
-			case <-quit:
-				return nil
-			}
-		}
-	}), nil
-}
-
-// ParseNFTCustody is a log parse operation binding the contract event 0x2eae7534e9f0d5d8a801dd79515d22a9c36f0b691692ca20f5bc04b94b055edc.
-//
-// Solidity: event NFTCustody(uint256 indexed tokenId, address holder)
-func (_CustosialVault *CustosialVaultFilterer) ParseNFTCustody(log types.Log) (*CustosialVaultNFTCustody, error) {
-	event := new(CustosialVaultNFTCustody)
-	if err := _CustosialVault.contract.UnpackLog(event, "NFTCustody", log); err != nil {
-		return nil, err
-	}
-	event.Raw = log
-	return event, nil
 }
 
 // CustosialVaultOwnershipTransferredIterator is returned from FilterOwnershipTransferred and is used to iterate over the raw logs and unpacked data for OwnershipTransferred events raised by the CustosialVault contract.
@@ -778,6 +619,152 @@ func (_CustosialVault *CustosialVaultFilterer) WatchOwnershipTransferred(opts *b
 func (_CustosialVault *CustosialVaultFilterer) ParseOwnershipTransferred(log types.Log) (*CustosialVaultOwnershipTransferred, error) {
 	event := new(CustosialVaultOwnershipTransferred)
 	if err := _CustosialVault.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// CustosialVaultTokenCustodyIterator is returned from FilterTokenCustody and is used to iterate over the raw logs and unpacked data for TokenCustody events raised by the CustosialVault contract.
+type CustosialVaultTokenCustodyIterator struct {
+	Event *CustosialVaultTokenCustody // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *CustosialVaultTokenCustodyIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(CustosialVaultTokenCustody)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(CustosialVaultTokenCustody)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *CustosialVaultTokenCustodyIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *CustosialVaultTokenCustodyIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// CustosialVaultTokenCustody represents a TokenCustody event raised by the CustosialVault contract.
+type CustosialVaultTokenCustody struct {
+	TokenId            *big.Int
+	Holder             common.Address
+	DestinationChainId *big.Int
+	Raw                types.Log // Blockchain specific contextual infos
+}
+
+// FilterTokenCustody is a free log retrieval operation binding the contract event 0x9bea55fe89520950ade3cb8f5b298d336f4ee0eca04a544b1b0760c40b4423b5.
+//
+// Solidity: event TokenCustody(uint256 indexed tokenId, address holder, uint256 destinationChainId)
+func (_CustosialVault *CustosialVaultFilterer) FilterTokenCustody(opts *bind.FilterOpts, tokenId []*big.Int) (*CustosialVaultTokenCustodyIterator, error) {
+
+	var tokenIdRule []interface{}
+	for _, tokenIdItem := range tokenId {
+		tokenIdRule = append(tokenIdRule, tokenIdItem)
+	}
+
+	logs, sub, err := _CustosialVault.contract.FilterLogs(opts, "TokenCustody", tokenIdRule)
+	if err != nil {
+		return nil, err
+	}
+	return &CustosialVaultTokenCustodyIterator{contract: _CustosialVault.contract, event: "TokenCustody", logs: logs, sub: sub}, nil
+}
+
+// WatchTokenCustody is a free log subscription operation binding the contract event 0x9bea55fe89520950ade3cb8f5b298d336f4ee0eca04a544b1b0760c40b4423b5.
+//
+// Solidity: event TokenCustody(uint256 indexed tokenId, address holder, uint256 destinationChainId)
+func (_CustosialVault *CustosialVaultFilterer) WatchTokenCustody(opts *bind.WatchOpts, sink chan<- *CustosialVaultTokenCustody, tokenId []*big.Int) (event.Subscription, error) {
+
+	var tokenIdRule []interface{}
+	for _, tokenIdItem := range tokenId {
+		tokenIdRule = append(tokenIdRule, tokenIdItem)
+	}
+
+	logs, sub, err := _CustosialVault.contract.WatchLogs(opts, "TokenCustody", tokenIdRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(CustosialVaultTokenCustody)
+				if err := _CustosialVault.contract.UnpackLog(event, "TokenCustody", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseTokenCustody is a log parse operation binding the contract event 0x9bea55fe89520950ade3cb8f5b298d336f4ee0eca04a544b1b0760c40b4423b5.
+//
+// Solidity: event TokenCustody(uint256 indexed tokenId, address holder, uint256 destinationChainId)
+func (_CustosialVault *CustosialVaultFilterer) ParseTokenCustody(log types.Log) (*CustosialVaultTokenCustody, error) {
+	event := new(CustosialVaultTokenCustody)
+	if err := _CustosialVault.contract.UnpackLog(event, "TokenCustody", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
