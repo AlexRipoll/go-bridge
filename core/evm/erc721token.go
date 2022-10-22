@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/AlexRipoll/go-bridge/contract"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
 )
 
@@ -17,16 +18,15 @@ type Erc721Token interface {
 
 type erc721TokenContract struct {
 	contract   *contract.Erc721Token
-	transactor transactor
-	//Client
+	transactor ContractTransactor
 }
 
-func NewErc721TokenContract(address string, transactor transactor, client Client) (Erc721Token, error) {
-	contract, err := contract.NewErc721Token(common.HexToAddress(address), client.conn)
+func NewErc721TokenContract(address string, transactor ContractTransactor, conn *ethclient.Client) (Erc721Token, error) {
+	c, err := contract.NewErc721Token(common.HexToAddress(address), conn)
 	if err != nil {
 		return nil, err
 	}
-	return erc721TokenContract{contract: contract, transactor: transactor}, nil
+	return erc721TokenContract{contract: c, transactor: transactor}, nil
 }
 
 func (b erc721TokenContract) Mint(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {

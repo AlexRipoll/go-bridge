@@ -2,19 +2,16 @@ package event
 
 import (
 	"context"
-	"github.com/ethereum/go-ethereum/common"
-)
-
-const (
-	MintAction    = "mint"
-	BurnAction    = "burn"
-	ReleaseAction = "release"
+	"math/big"
 )
 
 // TODO make TxHash generic
 type Rx struct {
-	TxHash common.Hash
-	Action string
+	TxHash      [32]byte
+	TxBlock     uint64
+	TokenId     *big.Int
+	Holder      string
+	Destination *big.Int
 }
 
 type Listener interface {

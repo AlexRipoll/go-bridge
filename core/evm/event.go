@@ -7,11 +7,12 @@ import (
 	"math/big"
 )
 
-type NftCustodyEvent struct {
-	TokenId *big.Int
-	Holder  common.Address
+type TokenCustodyEvent struct {
+	TokenId     *big.Int
+	Holder      common.Address
+	Destination *big.Int
 }
 
-var nftCustodyEventName = "NFTCustody"
-var nftCustodySig = []byte(fmt.Sprintf("%s(uint256,address)", nftCustodyEventName))
-var nftCustodySigHash = crypto.Keccak256Hash(nftCustodySig)
+var tokenCustodyEventName = "TokenCustody"
+var tokenCustodySig = []byte(fmt.Sprintf("%s(uint256,address,uint256)", tokenCustodyEventName))
+var tokenCustodySigHash = crypto.Keccak256Hash(tokenCustodySig)

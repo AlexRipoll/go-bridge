@@ -14,6 +14,7 @@ import (
 type Client struct {
 	conn       *ethclient.Client
 	chainId    uint64
+	finality   uint64
 	contracts  Contracts
 	Transactor ContractTransactor
 }
@@ -23,13 +24,29 @@ type Contracts struct {
 	erc721Token    Erc721Token
 }
 
-func NewTransactor(conn *ethclient.Client, privateKey string) (ContractTransactor, error) {
-	return &transactor{conn: conn}, nil
+func NewClient(
+	conn *ethclient.Client,
+	chainId, finality uint64,
+	custodialVaultContract Custodian,
+	erc721TokenContract Erc721Token,
+	) Client {
+	return Client{
+		conn:       conn,
+		chainId:    chainId,
+		finality:   finality,
+		contracts:  Contracts{
+			custodianVault: custodialVaultContract,
+			erc721Token:    erc721TokenContract,
+		},
+	}
 }
 
-type transactor struct {
-	conn *ethclient.Client
-	privateKey string
+func (c Client) ChainId() uint64 {
+	return c.chainId
+}
+
+func (c Client) Finality() uint64 {
+	return c.finality
 }
 
 type ContractTransactor interface {
@@ -40,6 +57,15 @@ type ContractTransactor interface {
 	CurrentBlock(ctx context.Context) (uint64, error)
 	TransactOpts(ctx context.Context) (*bind.TransactOpts, error)
 	CallOpts(ctx context.Context) (*bind.CallOpts, error)
+}
+
+type transactor struct {
+	conn       *ethclient.Client
+	privateKey string
+}
+
+func NewTransactor(conn *ethclient.Client, privateKey string) ContractTransactor {
+	return &transactor{conn: conn}
 }
 
 func (t transactor) privateKeyECDSA() (*ecdsa.PrivateKey, error) {
@@ -104,16 +130,16 @@ func (t transactor) TransactOpts(ctx context.Context) (*bind.TransactOpts, error
 		return nil, err
 	}
 
-	txOpt, err := bind.NewKeyedTransactorWithChainID(privateKeyECDSA, chainId)
+	txOpts, err := bind.NewKeyedTransactorWithChainID(privateKeyECDSA, chainId)
 	if err != nil {
 		return nil, err
 	}
-	txOpt.Nonce = big.NewInt(int64(nonce))
-	txOpt.Value = big.NewInt(0)
-	//txOpt.GasLimit = t.GasLimit
-	txOpt.GasPrice = gasPrice
+	txOpts.Nonce = big.NewInt(int64(nonce))
+	txOpts.Value = big.NewInt(0)
+	//txOpts.GasLimit = t.GasLimit
+	txOpts.GasPrice = gasPrice
 
-	return txOpt, nil
+	return txOpts, nil
 }
 
 func (t transactor) CallOpts(ctx context.Context) (*bind.CallOpts, error) {
@@ -123,8 +149,8 @@ func (t transactor) CallOpts(ctx context.Context) (*bind.CallOpts, error) {
 	}
 
 	callOpts := bind.CallOpts{
-		From:        caller,
-		Context:     ctx,
+		From:    caller,
+		Context: ctx,
 	}
 
 	return &callOpts, nil

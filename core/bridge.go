@@ -114,14 +114,6 @@ func (b Bridge) WalletTokens(address string, blockchain string) ([]*big.Int, err
 	return b.bridgers[blockchain].TokensOf(address)
 }
 
-func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.custodian.RetainToken(ctx, tokenId)
-	if err != nil {
-		return nil, err
-	}
-
-	return toTx(tx), nil
-}
 
 func (b Bridge) releaseNFT(ctx context.Context, walletAddress string, tokenId *big.Int) (*Tx, error) {
 	tx, err := b.custodian.ReleaseToken(ctx, walletAddress, tokenId)
@@ -156,54 +148,6 @@ func (b Bridge) burnNFT(ctx context.Context, origin string, tokenId *big.Int) (*
 	}
 
 	return toTx(tx), nil
-}
-
-func (b Bridge) Deploy(ctx context.Context) error {
-	_, err := b.custodian.Deploy(ctx)
-	if err != nil {
-		return err
-	}
-	for _, bridger := range b.bridgers {
-		_, err = bridger.Deploy(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (b Bridge) CompleteTransfer(ctx context.Context, ch chan event.Rx) error {
-	for {
-		eventRx := <-ch
-
-		buf, err := b.storage.Get([]byte(eventRx.TxHash.String()))
-		if err != nil {
-			return err
-		}
-
-		var txData TxData
-		if err := json.Unmarshal(buf, &txData); err != nil {
-			return err
-		}
-
-		switch eventRx.Action {
-		case event.MintAction:
-			tx, err := b.bridgers[txData.Destination].Mint(ctx, txData.Wallet, txData.TokenId)
-			if err != nil {
-				return err
-			}
-			log.Println("Mint Tx: ", tx)
-		case event.ReleaseAction:
-			tx, err := b.custodian.ReleaseToken(ctx, txData.Wallet, txData.TokenId)
-			if err != nil {
-				return err
-			}
-			log.Println("Release Tx: ", tx)
-		default:
-			return fmt.Errorf("unknow action; %v", eventRx.Action)
-		}
-	}
 }
 
 func toTx(tx *evm.Tx) *Tx {
