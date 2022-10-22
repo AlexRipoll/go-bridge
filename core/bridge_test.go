@@ -15,7 +15,7 @@ func TestNewBridge(t *testing.T) {
 	defer ctrl.Finish()
 
 	custodianMock := evm2.NewMockCustodian(ctrl)
-	bridgers := make(map[string]evm2.Bridger)
+	bridgers := make(map[string]evm2.Erc721Token)
 
 	t.Run("initialize new bridge instance", func(t *testing.T) {
 		_, err := core.NewBridge(custodianMock, bridgers)
@@ -34,7 +34,7 @@ func TestBridgeRetainNFT(t *testing.T) {
 	polygonBridgerMock := evm2.NewMockBridger(ctrl)
 	hederaBridgerMock := evm2.NewMockBridger(ctrl)
 
-	bridgers := make(map[string]evm2.Bridger)
+	bridgers := make(map[string]evm2.Erc721Token)
 	bridgers["polygon"] = polygonBridgerMock
 	bridgers["hedera"] = hederaBridgerMock
 
@@ -42,7 +42,7 @@ func TestBridgeRetainNFT(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected nil error, got %v", err)
 	}
-	t.Run("successfully retain Bridger and mint", func(t *testing.T) {
+	t.Run("successfully retain Erc721Token and mint", func(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "ethereum"
@@ -63,7 +63,7 @@ func TestBridgeRetainNFT(t *testing.T) {
 			t.Fatalf("expected nil error, got %v", err)
 		}
 	})
-	t.Run("successfully burn copy and release Bridger", func(t *testing.T) {
+	t.Run("successfully burn copy and release Erc721Token", func(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "polygon"
@@ -105,7 +105,7 @@ func TestBridgeRetainNFT(t *testing.T) {
 			t.Fatalf("expected nil error, got %v", err)
 		}
 	})
-	t.Run("fail to transfer Bridger", func(t *testing.T) {
+	t.Run("fail to transfer Erc721Token", func(t *testing.T) {
 		ctx := context.Background()
 		tokenId := big.NewInt(0)
 		origin := "ethereum"

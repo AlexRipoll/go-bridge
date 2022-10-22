@@ -16,11 +16,11 @@ import (
 type Bridge struct {
 	mainNetwork string
 	custodian   evm.Custodian
-	bridgers    map[string]evm.Bridger
+	bridgers    map[string]evm.Erc721Token
 	storage     storage.Storage
 }
 
-func NewBridge(mainNetwork string, vault evm.Custodian, bridger map[string]evm.Bridger) (*Bridge, error) {
+func NewBridge(mainNetwork string, vault evm.Custodian, bridger map[string]evm.Erc721Token) (*Bridge, error) {
 	return &Bridge{
 		mainNetwork: mainNetwork,
 		custodian:   vault,
@@ -115,7 +115,7 @@ func (b Bridge) WalletTokens(address string, blockchain string) ([]*big.Int, err
 }
 
 func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.custodian.RetainNFT(ctx, tokenId)
+	tx, err := b.custodian.RetainToken(ctx, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (b Bridge) retainNFT(ctx context.Context, tokenId *big.Int) (*Tx, error) {
 }
 
 func (b Bridge) releaseNFT(ctx context.Context, walletAddress string, tokenId *big.Int) (*Tx, error) {
-	tx, err := b.custodian.ReleaseNFT(ctx, walletAddress, tokenId)
+	tx, err := b.custodian.ReleaseToken(ctx, walletAddress, tokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func (b Bridge) CompleteTransfer(ctx context.Context, ch chan event.Rx) error {
 			}
 			log.Println("Mint Tx: ", tx)
 		case event.ReleaseAction:
-			tx, err := b.custodian.ReleaseNFT(ctx, txData.Wallet, txData.TokenId)
+			tx, err := b.custodian.ReleaseToken(ctx, txData.Wallet, txData.TokenId)
 			if err != nil {
 				return err
 			}

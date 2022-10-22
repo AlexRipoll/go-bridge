@@ -17,20 +17,20 @@ type Erc721Token interface {
 
 type erc721TokenContract struct {
 	contract   *contract.Erc721Token
-	transactor geth
+	transactor transactor
 	//Client
 }
 
-func NewErc721TokenContract(address string, client Client) (Erc721Token, error) {
+func NewErc721TokenContract(address string, transactor transactor, client Client) (Erc721Token, error) {
 	contract, err := contract.NewErc721Token(common.HexToAddress(address), client.conn)
 	if err != nil {
 		return nil, err
 	}
-	return erc721TokenContract{contract: contract}, nil
+	return erc721TokenContract{contract: contract, transactor: transactor}, nil
 }
 
 func (b erc721TokenContract) Mint(ctx context.Context, wallet string, tokenId *big.Int) (*Tx, error) {
-	txOps, err := b.transactor.prepareTransactor(ctx)
+	txOps, err := b.transactor.TransactOpts(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (b erc721TokenContract) Mint(ctx context.Context, wallet string, tokenId *b
 }
 
 func (b erc721TokenContract) Burn(ctx context.Context, tokenId *big.Int) (*Tx, error) {
-	txOps, err := b.transactor.prepareTransactor(ctx)
+	txOps, err := b.transactor.TransactOpts(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (b erc721TokenContract) Burn(ctx context.Context, tokenId *big.Int) (*Tx, e
 }
 
 func (b erc721TokenContract) Exists(ctx context.Context, tokenId *big.Int) (bool, error) {
-	callOpts, err := b.transactor.prepareCallOpts(ctx)
+	callOpts, err := b.transactor.CallOpts(ctx)
 	if err != nil {
 		return false, err
 	}
@@ -67,7 +67,7 @@ func (b erc721TokenContract) Exists(ctx context.Context, tokenId *big.Int) (bool
 }
 
 func (b erc721TokenContract) OwnerOf(ctx context.Context, tokenId *big.Int) (string, error) {
-	callOpts, err := b.transactor.prepareCallOpts(ctx)
+	callOpts, err := b.transactor.CallOpts(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -81,7 +81,7 @@ func (b erc721TokenContract) OwnerOf(ctx context.Context, tokenId *big.Int) (str
 }
 
 func (b erc721TokenContract) TokensOf(ctx context.Context, wallet string) ([]*big.Int, error) {
-	callOpts, err := b.transactor.prepareCallOpts(ctx)
+	callOpts, err := b.transactor.CallOpts(ctx)
 	if err != nil {
 		return nil, err
 	}

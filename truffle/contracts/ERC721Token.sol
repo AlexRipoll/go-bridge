@@ -28,6 +28,10 @@ contract ERC721Token is ERC721Enumerable, Ownable {
         _burn(tokenId);
     }
 
+    function exists(uint256 tokenId) public view virtual returns (bool) {
+        return _exists(tokenId);
+    }
+
     function walletOfOwner(address _owner)
         public
         view

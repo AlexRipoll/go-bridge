@@ -14,7 +14,7 @@ contract ERC721CustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
 
     mapping(uint256 => address) public holdCustody;
 
-    event TokenCustody (uint256 indexed tokenId, address holder);
+    event TokenCustody (uint256 indexed tokenId, address holder, uint256 destinationChainId);
 
     ERC721Enumerable erc721token;
 
@@ -37,18 +37,17 @@ contract ERC721CustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
     *
     * Emits a {TokenCustody} event.
     */
-    function retainToken(uint256 tokenId) public payable nonReentrant {
+    function retainToken(uint256 tokenId, uint256 destination) public payable nonReentrant {
         require(msg.value == txCost, "Not enough balance to complete transaction.");
         require(erc721token.ownerOf(tokenId) == msg.sender, "you must be the Token owner for executing this action");
         require(holdCustody[tokenId] == address(0), "Token already stored");
         holdCustody[tokenId] = msg.sender;
         erc721token.transferFrom(erc721token.ownerOf(tokenId), address(this), tokenId);
-        emit TokenCustody(tokenId, msg.sender);
+        emit TokenCustody(tokenId, msg.sender, destination);
     }
 
     function updateOwner(uint256 tokenId, address newHolder) public nonReentrant onlyOwner() {
         holdCustody[tokenId] = newHolder;
-        emit TokenCustody(tokenId, newHolder);
     }
 
 //    function heldCustody(uint256 tokenId) public view returns (address) {

@@ -21,7 +21,7 @@ type handler struct {
 
 func NewHandler(config config.Config) (*handler, error) {
 	var custodian evm2.Custodian
-	bridgers := make(map[string]evm2.Bridger)
+	bridgers := make(map[string]evm2.Erc721Token)
 
 	for name, network := range config.Networks {
 		conn, err := ethclient.Dial(network.Http)
