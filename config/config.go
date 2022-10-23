@@ -6,20 +6,23 @@ import (
 )
 
 type Config struct {
-	Host          string
 	PrivateKey    string
-	WalletAddress string
-	GasLimit      uint64
-	MainNetwork   string
-	Networks      map[string]Network
+	Goerli    Blockchain
+	Mumbai    Blockchain
+	Bsct    Blockchain
 }
 
-type Network struct {
+type Blockchain struct {
 	Http          string
 	Ws            string
-	Type          string
-	BlockFinality uint
-	Contracts     map[string]string
+	ChainId          uint64
+	BlockFinality uint64
+	Contracts     Contracts
+}
+
+type Contracts struct {
+	ERC721TokenAddress string
+	CustodialVaultAddress string
 }
 
 func Load() (Config, error) {
