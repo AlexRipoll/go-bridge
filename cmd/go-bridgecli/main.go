@@ -5,11 +5,11 @@ import (
 	"github.com/AlexRipoll/go-bridge/config"
 	"github.com/AlexRipoll/go-bridge/core/evm"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"log"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-
+	log.Info("initializing process...")
 	// add tests
 	// update config
 	// move code to service
@@ -64,22 +64,32 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Infof("connection established to %v", goerli.Ws)
+
 	ethListner := evm.NewListener(goerliWs, goerli.Contracts.CustodialVaultAddress, releaser)
-	ethListner.Listen(context.Background())
+	go ethListner.Listen(context.Background())
 
 	polWs, err := ethclient.Dial(mumbai.Ws)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Infof("connection established to %v", mumbai.Ws)
+
 	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, releaser)
-	polygonListner.Listen(context.Background())
+	go polygonListner.Listen(context.Background())
 
 	bscWs, err := ethclient.Dial(bsct.Ws)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Infof("connection established to %v", bsct.Ws)
+
 	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, releaser)
-	bscListner.Listen(context.Background())
+	go bscListner.Listen(context.Background())
+
+	ch := make(chan struct{})
+
+	<-ch
 }
 
 func NewClient(http string, chainId, finality uint64, privateKey, custodialVaultAddress, erc721TokenAddress string) evm.Client {
@@ -87,6 +97,7 @@ func NewClient(http string, chainId, finality uint64, privateKey, custodialVault
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Infof("connection established to %v", http)
 
 	transactor := evm.NewTransactor(conn, privateKey)
 	custodian, err := evm.NewErc721CustodialVaultContract(custodialVaultAddress, transactor, conn)

@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	log "github.com/sirupsen/logrus"
 	"math/big"
 	"strings"
 )
@@ -38,12 +39,14 @@ func (l Listener) Listen(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Infof("listening events at address %v", l.contract.String())
 
 	for {
 		select {
 		case err := <-sub.Err():
 			return err
 		case vLog := <-logs:
+			log.Infof("event received...")
 			tokenEvent, err := l.digestEvent(ctx, vLog)
 			if err != nil {
 				return err
@@ -56,12 +59,14 @@ func (l Listener) Listen(ctx context.Context) error {
 				Holder:      tokenEvent.Holder.String(),
 				Destination: tokenEvent.Destination,
 			}
+			log.Infof("event receipt %#v", l.contract.String())
 			go l.releaser.releaseToken(ctx, rx)
 		}
 	}
 }
 
 func (l Listener) digestEvent(ctx context.Context, vLog types.Log) (*TokenCustodyEvent, error) {
+	log.Infof("digesting event %v", vLog.TxHash)
 	switch vLog.Topics[0].Hex() {
 	case tokenCustodySigHash.Hex():
 		contractAbi, err := abi.JSON(strings.NewReader(string(contract.CustosialVaultMetaData.ABI)))

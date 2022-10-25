@@ -38,7 +38,7 @@ func Load() (Config, error) {
 	}
 	var c Config
 	if err := viper.Unmarshal(&c); err != nil {
-		fmt.Printf("Unable to decode into struct, %v", err)
+		return Config{}, fmt.Errorf("Unable to decode into struct, %v", err)
 	}
 	return c, nil
 }

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/core/event"
-	"github.com/ethereum/go-ethereum/log"
+	log "github.com/sirupsen/logrus"
 	"math/big"
 	"time"
 )
@@ -52,18 +52,25 @@ func (r Releaser) waitForFinality(ctx context.Context, client Client, rx event.R
 	if err != nil {
 		return err
 	}
+	log.Infof("block amount for reaching finality: %v", client.finality)
 
 	for  {
+		log.Info("waiting for reaching finality...")
 		currentBlock, err := client.Transactor.CurrentBlock(ctx)
 		if err != nil {
 			return err
 		}
+		log.Infof("current block number: %v", currentBlock)
+		log.Infof("block amount left for reaching finality: %v", currentBlock - rx.TxBlock)
+
 
 		if (currentBlock - rx.TxBlock) >= client.Finality() {
+			log.Infof("finality reached")
 			if !exists {
 				if _, err := client.contracts.erc721Token.Mint(ctx, rx.Holder, rx.TokenId); err != nil {
 					return err
 				}
+				log.Infof("minting token with Id %v and releasing it to address %v", rx.TokenId, rx.Holder)
 				return nil
 			}
 			// check if owner is custodial vault
@@ -75,6 +82,7 @@ func (r Releaser) waitForFinality(ctx context.Context, client Client, rx event.R
 			if err != nil {
 				return err
 			}
+			log.Infof("token with Id %v released to address %v", rx.TokenId, rx.Holder)
 
 			return nil
 		}
