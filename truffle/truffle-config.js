@@ -1,4 +1,4 @@
-require("dotenv").config({ path: '../.env' });
+require("dotenv").config({ path: '.env' });
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const mnemonic = process.env["mnemonic"];
