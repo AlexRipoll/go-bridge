@@ -22,6 +22,6 @@ config.yml
 # IDE files
 .idea
 
-.env
+truffle/.env
 keystore
 ~/

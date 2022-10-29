@@ -14,11 +14,15 @@ module.exports = {
         // },
         goerli: {
             provider: function() {
-                return new HDWalletProvider(privateKey, "https://goerli.infura.io/v3/72902afeffe44eeba2ed93d798f87ebd");
+                return new HDWalletProvider(privateKey, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
             },
             network_id: '5',
-            gas: 4465030,
-            gasPrice: 63363054162,
+        },
+        sepolia: {
+            provider: function() {
+                return new HDWalletProvider(privateKey, "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
+            },
+            network_id: '11155111',
         },
         mumbai: {
             provider: function() {

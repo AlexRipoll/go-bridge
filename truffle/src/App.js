@@ -73,36 +73,71 @@ function App() {
         })
     }
 
+    const providerRpc = async (chainId) => {
+        const goerliChainId = Number(process.env.REACT_APP_goerliChainId);
+        const mumbaiChainId = Number(process.env.REACT_APP_mumbaiChainId);
+        const bsctChainId = Number(process.env.REACT_APP_bsctChainId);
+        console.log("Ci: ", chainId);
+        console.log("G: ", goerliChainId);
+        console.log("M: ", mumbaiChainId);
+        console.log("B: ", bsctChainId);
+        let provider;
+        switch(chainId) {
+            // case goerliChainId:
+            //     provider = process.env.REACT_APP_goerliRpc;
+            //     break;
+            case mumbaiChainId:
+                provider = process.env.REACT_APP_mumbaiRpc;
+                break;
+            case bsctChainId:
+                provider = process.env.REACT_APP_bsctRpc;
+
+                break;
+            default:
+            throw new Error("unsupported network")
+        }
+        return provider
+    }
+
     const retrieveTokens = async () => {
-        const provider = new Web3("https://goerli.infura.io/v3/72902afeffe44eeba2ed93d798f87ebd");
         const networkId = await web3.eth.net.getId()
-        const networkData = ERC721Token.networks[networkId]
+        const rpc = await providerRpc(networkId);
+        console.log("RPC: ", rpc)
+        const provider = new Web3(rpc);
+        const networkData = ERC721Token.networks[networkId];
+        console.log("PROVIDER ", provider)
+        console.log("NETWORKDATA", networkData)
+
         const accounts = await web3.eth.requestAccounts();
         if(networkData) {
+            console.log("network data")
             const ERC721TokenAbi = ERC721Token.abi;
             const address = networkData.address;
             const contract = new web3.eth.Contract(ERC721TokenAbi, address);
-            // TODO probar en interactive mode con truffle
-            const walletTokens = await contract.methods.walletOfOwner(accounts[0]).call()
+            const walletTokens = await contract.methods.walletOfOwner(accounts[0]).call();
+            console.log(`${accounts[0]} tokens: ${walletTokens}`);
+            // TODO print tokens in front (must be selectable)
         }
 
     }
+
+    // TODO ask to switch network when mismatch between wallet network and select value
 
     // TODO
     const transfer = async () => {
         //https://ethereum.stackexchange.com/questions/91510/call-contract-view-method-from-web3
 
-        const provider = new Web3("https://goerli.infura.io/v3/72902afeffe44eeba2ed93d798f87ebd");
-        const networkId = await web3.eth.net.getId()
-        const networkData = CustodialVault.networks[networkId]
-        const accounts = await web3.eth.requestAccounts();
-        if(networkData) {
-            const custodialVaultAbi = CustodialVault.abi;
-            const address = networkData.address;
-            const contract = new web3.eth.Contract(custodialVaultAbi, address);
-            // TODO probar en interactive mode con truffle
-            const tx = await contract.methods.reteinToken(tokenId).send({from: accounts[0], value: 1000});
-        }
+        // const provider = new Web3("https://goerli.infura.io/v3/72902afeffe44eeba2ed93d798f87ebd");
+        // const networkId = await web3.eth.net.getId()
+        // const networkData = CustodialVault.networks[networkId]
+        // const accounts = await web3.eth.requestAccounts();
+        // if(networkData) {
+        //     const custodialVaultAbi = CustodialVault.abi;
+        //     const address = networkData.address;
+        //     const contract = new web3.eth.Contract(custodialVaultAbi, address);
+        //     // TODO probar en interactive mode con truffle
+        //     const tx = await contract.methods.reteinToken(tokenId).send({from: accounts[0], value: 1000});
+        // }
     }
 
     // logging()
