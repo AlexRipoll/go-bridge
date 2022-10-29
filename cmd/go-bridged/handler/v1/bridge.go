@@ -16,7 +16,7 @@ import (
 )
 
 type handler struct {
-	bridge *core.Bridge
+	bridge *core.Service
 }
 
 func NewHandler(config config.Config) (*handler, error) {

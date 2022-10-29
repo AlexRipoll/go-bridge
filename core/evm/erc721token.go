@@ -37,6 +37,10 @@ func (b erc721TokenContract) Mint(ctx context.Context, wallet string, tokenId *b
 
 	walletAddress := common.HexToAddress(wallet)
 	gethTx, err := b.contract.Mint(txOps, walletAddress, tokenId)
+	if err != nil {
+		return nil, err
+	}
+
 	tx := transactionToTx(gethTx)
 
 	return &tx, nil
@@ -47,11 +51,11 @@ func (b erc721TokenContract) Burn(ctx context.Context, tokenId *big.Int) (*Tx, e
 	if err != nil {
 		return nil, err
 	}
-
 	gethTx, err := b.contract.Burn(txOps, tokenId)
 	if err != nil {
 		return nil, err
 	}
+
 	tx := transactionToTx(gethTx)
 
 	return &tx, nil

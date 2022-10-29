@@ -2,111 +2,73 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"github.com/AlexRipoll/go-bridge/config"
+	"github.com/AlexRipoll/go-bridge/core"
 	"github.com/AlexRipoll/go-bridge/core/evm"
 	"github.com/ethereum/go-ethereum/ethclient"
 	log "github.com/sirupsen/logrus"
+	"math/big"
+	"strconv"
 )
 
 func main() {
-	log.Info("initializing process...")
-	// add tests
-	// update config
-	// move code to service
-	// recovery system (DB...)
-	// logging
-	// update function
-	// docs
+	fn := flag.Bool("fn", false, "executes a function")
+
+	flag.Parse()
 
 	config, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	goerli := config.Goerli
+
 	mumbai := config.Mumbai
-	bsct := config.Bsct
 
-	goerliClient := NewClient(
-		goerli.Http,
-		goerli.ChainId,
-		goerli.BlockFinality,
-		config.PrivateKey,
-		goerli.Contracts.CustodialVaultAddress,
-		goerli.Contracts.ERC721TokenAddress,
-		)
+	log.Info("Chain Id: ", mumbai.ChainId)
+	log.Info("RPC: ", mumbai.Http)
+	log.Info("ERC721TokenAddress: ", mumbai.Contracts.ERC721TokenAddress)
 
-	mumbaiClient := NewClient(
-		mumbai.Http,
-		mumbai.ChainId,
-		mumbai.BlockFinality,
-		config.PrivateKey,
-		mumbai.Contracts.CustodialVaultAddress,
-		mumbai.Contracts.ERC721TokenAddress,
-	)
-
-	bsctClient := NewClient(
-		bsct.Http,
-		bsct.ChainId,
-		bsct.BlockFinality,
-		config.PrivateKey,
-		bsct.Contracts.CustodialVaultAddress,
-		bsct.Contracts.ERC721TokenAddress,
-	)
-
-	releaser := evm.Releaser{
-		EthereumClient: goerliClient,
-		PolygonClient:  mumbaiClient,
-		BinanceClient:  bsctClient,
-	}
-
-	goerliWs, err := ethclient.Dial(goerli.Ws)
+	conn, err := ethclient.Dial(mumbai.Http)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Infof("connection established to %v", goerli.Ws)
-
-	ethListner := evm.NewListener(goerliWs, goerli.Contracts.CustodialVaultAddress, releaser)
-	go ethListner.Listen(context.Background())
-
-	polWs, err := ethclient.Dial(mumbai.Ws)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("connection established to %v", mumbai.Ws)
-
-	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, releaser)
-	go polygonListner.Listen(context.Background())
-
-	bscWs, err := ethclient.Dial(bsct.Ws)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("connection established to %v", bsct.Ws)
-
-	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, releaser)
-	go bscListner.Listen(context.Background())
-
-	ch := make(chan struct{})
-
-	<-ch
-}
-
-func NewClient(http string, chainId, finality uint64, privateKey, custodialVaultAddress, erc721TokenAddress string) evm.Client {
-	conn, err := ethclient.Dial(http)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("connection established to %v", http)
-
-	transactor := evm.NewTransactor(conn, privateKey)
-	custodian, err := evm.NewErc721CustodialVaultContract(custodialVaultAddress, transactor, conn)
-	if err != nil {
-		log.Fatalf("NewErc721CustodialVaultContract error: %v", err)
-	}
-	erc721Token, err := evm.NewErc721TokenContract(erc721TokenAddress, transactor, conn)
+	log.Infof("connection established to %v", mumbai.Http)
+	transactor := evm.NewTransactor(conn, config.PrivateKey)
+	erc721Token, err := evm.NewErc721TokenContract(mumbai.Contracts.ERC721TokenAddress, transactor, conn)
 	if err != nil {
 		log.Fatalf("NewErc721TokenContract error: %v", err)
 	}
-	return evm.NewClient(conn, chainId, finality, custodian, erc721Token)
+
+	service := core.NewService(erc721Token)
+
+	if *fn {
+		switch flag.Arg(0) {
+		case "mint":
+			walletAddress := flag.Arg(1)
+			tokenIdArg := flag.Arg(2)
+			tokenId, err := strconv.Atoi(tokenIdArg)
+			if err != nil {
+				log.Fatalf("%v is not an integer", tokenIdArg)
+			}
+
+			tx, err := service.MintERC721Token(context.Background(), walletAddress, big.NewInt(int64(tokenId)))
+			if err != nil {
+				log.Fatal(" error minting token: ", err)
+			}
+			fmt.Println(fmt.Sprintf("%#v", tx))
+		case "wallet":
+			walletAddress := flag.Arg(1)
+
+			tokens, err := service.WalletTokens(context.Background(), walletAddress)
+			if err != nil {
+				log.Fatalf("error fetching tokens: %v", err)
+			}
+			fmt.Println("Token Ids: ", tokens)
+		default:
+			log.Fatalf("unknow method: %s", flag.Arg(0))
+		}
+	}
+
 }

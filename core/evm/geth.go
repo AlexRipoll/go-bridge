@@ -65,7 +65,7 @@ type transactor struct {
 }
 
 func NewTransactor(conn *ethclient.Client, privateKey string) ContractTransactor {
-	return &transactor{conn: conn}
+	return &transactor{conn: conn, privateKey: privateKey}
 }
 
 func (t transactor) privateKeyECDSA() (*ecdsa.PrivateKey, error) {
