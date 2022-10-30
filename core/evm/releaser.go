@@ -86,7 +86,7 @@ func (r Releaser) waitForFinality(ctx context.Context, client Client, rx event.R
 
 			return nil
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 10)
 	}
 }
 

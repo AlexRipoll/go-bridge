@@ -16,7 +16,7 @@ contract("ERC721CustodialVault", (accounts) => {
         await ERC721TokenInstance.mint(accounts[0], tokenId);
 
         await ERC721TokenInstance.approve(ERC721CustodialVaultInstance.address, tokenId);
-        const token = await ERC721CustodialVaultInstance.retainToken(tokenId, {from: accounts[0], value: 1000});
+        const token = await ERC721CustodialVaultInstance.retainToken(tokenId, 97, {from: accounts[0], value: 1000});
 
         const tokens = await ERC721TokenInstance.walletOfOwner(accounts[0]);
         assert.equal(tokens.length, 0, `expecting 0 token, got ${tokens.length}`);

@@ -25,18 +25,34 @@ func main() {
 
 
 	mumbai := config.Mumbai
+	bsct := config.Bsct
 
 	log.Info("Chain Id: ", mumbai.ChainId)
 	log.Info("RPC: ", mumbai.Http)
 	log.Info("ERC721TokenAddress: ", mumbai.Contracts.ERC721TokenAddress)
 
-	conn, err := ethclient.Dial(mumbai.Http)
+	log.Info("Chain Id: ", bsct.ChainId)
+	log.Info("RPC: ", bsct.Http)
+	log.Info("ERC721TokenAddress: ", bsct.Contracts.ERC721TokenAddress)
+
+	//conn, err := ethclient.Dial(mumbai.Http)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Infof("connection established to %v", mumbai.Http)
+	//transactor := evm.NewTransactor(conn, config.PrivateKey)
+	//erc721Token, err := evm.NewErc721TokenContract(mumbai.Contracts.ERC721TokenAddress, transactor, conn)
+	//if err != nil {
+	//	log.Fatalf("NewErc721TokenContract error: %v", err)
+	//}
+
+	conn, err := ethclient.Dial(bsct.Http)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Infof("connection established to %v", mumbai.Http)
 	transactor := evm.NewTransactor(conn, config.PrivateKey)
-	erc721Token, err := evm.NewErc721TokenContract(mumbai.Contracts.ERC721TokenAddress, transactor, conn)
+	erc721Token, err := evm.NewErc721TokenContract(bsct.Contracts.ERC721TokenAddress, transactor, conn)
 	if err != nil {
 		log.Fatalf("NewErc721TokenContract error: %v", err)
 	}

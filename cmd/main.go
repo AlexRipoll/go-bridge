@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/AlexRipoll/go-bridge/config"
 	"github.com/AlexRipoll/go-bridge/core/evm"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -23,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	goerli := config.Goerli
+	//goerli := config.Goerli
 	mumbai := config.Mumbai
 	bsct := config.Bsct
 
@@ -60,18 +61,19 @@ func main() {
 		BinanceClient:  bsctClient,
 	}
 
-	goerliWs, err := ethclient.Dial(goerli.Ws)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Infof("connection established to %v", goerli.Ws)
+	//goerliWs, err := ethclient.Dial(goerli.Ws)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Infof("connection established to %v", goerli.Ws)
 
-	ethListner := evm.NewListener(goerliWs, goerli.Contracts.CustodialVaultAddress, releaser)
-	go ethListner.Listen(context.Background())
+	//ethListner := evm.NewListener(goerliWs, goerli.Contracts.CustodialVaultAddress, releaser)
+	//go ethListner.Listen(context.Background())
 
+	fmt.Println(mumbai.Ws)
 	polWs, err := ethclient.Dial(mumbai.Ws)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("----", err)
 	}
 	log.Infof("connection established to %v", mumbai.Ws)
 
