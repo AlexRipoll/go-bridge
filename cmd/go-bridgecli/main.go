@@ -23,7 +23,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-
 	mumbai := config.Mumbai
 	bsct := config.Bsct
 

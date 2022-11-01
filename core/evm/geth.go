@@ -30,12 +30,12 @@ func NewClient(
 	custodialVaultContract Custodian,
 	erc721TokenContract Erc721Token,
 	transactor ContractTransactor,
-	) Client {
+) Client {
 	return Client{
-		conn:       conn,
-		chainId:    chainId,
-		finality:   finality,
-		contracts:  Contracts{
+		conn:     conn,
+		chainId:  chainId,
+		finality: finality,
+		contracts: Contracts{
 			custodianVault: custodialVaultContract,
 			erc721Token:    erc721TokenContract,
 		},

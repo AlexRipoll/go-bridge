@@ -11,7 +11,7 @@ import (
 )
 
 type Releaser struct {
-	Clients        map[uint64]Client
+	Clients map[uint64]Client
 }
 
 func (r Releaser) releaseToken(ctx context.Context, rx event.Rx) error {

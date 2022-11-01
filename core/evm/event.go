@@ -8,7 +8,7 @@ import (
 )
 
 type TokenCustodyEvent struct {
-	TokenId     *big.Int
+	TokenId            *big.Int
 	Holder             common.Address
 	DestinationChainId *big.Int
 }

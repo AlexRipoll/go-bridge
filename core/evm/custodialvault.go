@@ -18,7 +18,7 @@ type Custodian interface {
 }
 
 type erc721CustodialVaultContract struct {
-	address	string
+	address    string
 	contract   *contract.CustosialVault
 	transactor ContractTransactor
 }

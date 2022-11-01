@@ -18,7 +18,7 @@ import (
 type Listener struct {
 	conn     *ethclient.Client
 	contract common.Address
-	chainId *big.Int
+	chainId  *big.Int
 	releaser Releaser
 }
 
@@ -26,7 +26,7 @@ func NewListener(conn *ethclient.Client, contractAddress string, chainId uint64,
 	return Listener{
 		conn:     conn,
 		contract: common.HexToAddress(contractAddress),
-		chainId: big.NewInt(int64(chainId)),
+		chainId:  big.NewInt(int64(chainId)),
 		releaser: releaser,
 	}
 }
@@ -60,7 +60,7 @@ func (l Listener) Listen(ctx context.Context) error {
 				TxBlock:     vLog.BlockNumber,
 				TokenId:     tokenEvent.TokenId,
 				Holder:      tokenEvent.Holder.String(),
-				Origin: l.chainId,
+				Origin:      l.chainId,
 				Destination: tokenEvent.DestinationChainId,
 			}
 			log.Infof("event receipt %#v", l.contract.String())

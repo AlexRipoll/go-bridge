@@ -6,22 +6,22 @@ import (
 )
 
 type Config struct {
-	PrivateKey    string
-	Goerli    Blockchain
-	Mumbai    Blockchain
-	Bsct    Blockchain
+	PrivateKey string
+	Goerli     Blockchain
+	Mumbai     Blockchain
+	Bsct       Blockchain
 }
 
 type Blockchain struct {
 	Http          string
 	Ws            string
-	ChainId          uint64
+	ChainId       uint64
 	BlockFinality uint64
 	Contracts     Contracts
 }
 
 type Contracts struct {
-	ERC721TokenAddress string
+	ERC721TokenAddress    string
 	CustodialVaultAddress string
 }
 

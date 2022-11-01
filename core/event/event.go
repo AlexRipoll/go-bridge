@@ -11,7 +11,7 @@ type Rx struct {
 	TxBlock     uint64
 	TokenId     *big.Int
 	Holder      string
-	Origin *big.Int
+	Origin      *big.Int
 	Destination *big.Int
 }
 

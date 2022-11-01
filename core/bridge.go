@@ -43,7 +43,6 @@ func (s Service) WalletTokens(ctx context.Context, walletAddress string) ([]*big
 	return tokens, nil
 }
 
-
 func (s Service) releaseNFT(ctx context.Context, walletAddress string, tokenId *big.Int) (*Tx, error) {
 	return nil, nil
 }
