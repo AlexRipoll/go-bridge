@@ -10,75 +10,65 @@ import (
 	"time"
 )
 
-var (
-	ethereumChainId = *big.NewInt(5)
-	polygonChainId  = *big.NewInt(80001)
-	bscChainId      = *big.NewInt(59)
-)
-
 type Releaser struct {
-	EthereumClient Client
-	PolygonClient  Client
-	BinanceClient  Client
+	Clients        map[uint64]Client
 }
 
 func (r Releaser) releaseToken(ctx context.Context, rx event.Rx) error {
-		switch rx.Destination.Int64() {
-		case ethereumChainId.Int64():
-			if err := r.waitForFinality(ctx, r.EthereumClient, rx); err != nil {
-				log.Error(fmt.Sprintf("wait for finality error (ethereum): %v", err.Error()))
-				return err
-			}
-			return nil
-		case polygonChainId.Int64():
-			if err := r.waitForFinality(ctx, r.PolygonClient, rx); err != nil {
-				log.Error(fmt.Sprintf("wait for finality error (polygon): %v", err.Error()))
-				return err
-			}
-			return nil
-		case bscChainId.Int64():
-			if err := r.waitForFinality(ctx, r.BinanceClient, rx); err != nil {
-				log.Error(fmt.Sprintf("wait for finality error (binance): %v", err.Error()))
-				return err
-			}
-			return nil
-		default:
-			return fmt.Errorf("unknown destination blockchain: %v", rx.Destination.Int64())
-		}
+	log.Infof("initializing token release process to chain id %v...", rx.Destination.Int64())
+
+	if err := r.waitForFinality(ctx, rx); err != nil {
+		log.Error(fmt.Sprintf("wait for finality error (ethereum): %v", err.Error()))
+		return err
+	}
+	return nil
 }
 
-func (r Releaser) waitForFinality(ctx context.Context, client Client, rx event.Rx) error {
-	exists, err := client.contracts.erc721Token.Exists(ctx, rx.TokenId)
+func (r Releaser) waitForFinality(ctx context.Context, rx event.Rx) error {
+	originClient, exists := r.Clients[rx.Origin.Uint64()]
+	if !exists {
+		return fmt.Errorf("no client with chain id %v in releaser", rx.Origin.Uint64())
+	}
+	destinationClient, exists := r.Clients[rx.Destination.Uint64()]
+	if !exists {
+		return fmt.Errorf("no client with chain id %v in releaser", rx.Destination.Uint64())
+	}
+
+	exists, err := destinationClient.contracts.erc721Token.Exists(ctx, rx.TokenId)
 	if err != nil {
 		return err
 	}
-	log.Infof("block amount for reaching finality: %v", client.finality)
+	log.Infof("block amount for reaching finality: %v", destinationClient.finality)
 
-	for  {
+	for {
 		log.Info("waiting for reaching finality...")
-		currentBlock, err := client.Transactor.CurrentBlock(ctx)
+		currentBlock, err := originClient.Transactor.CurrentBlock(ctx)
 		if err != nil {
 			return err
 		}
 		log.Infof("current block number: %v", currentBlock)
-		log.Infof("block amount left for reaching finality: %v", currentBlock - rx.TxBlock)
+		log.Infof("TX block number: %v", rx.TxBlock)
+		log.Infof("block amount left for reaching finality: %v", currentBlock-rx.TxBlock)
+		log.Info("----------------------------------------------")
+		log.Info(currentBlock - rx.TxBlock)
+		log.Info((currentBlock - rx.TxBlock) >= destinationClient.Finality())
+		log.Info("----------------------------------------------")
 
-
-		if (currentBlock - rx.TxBlock) >= client.Finality() {
+		if (currentBlock - rx.TxBlock) >= destinationClient.Finality() {
 			log.Infof("finality reached")
 			if !exists {
-				if _, err := client.contracts.erc721Token.Mint(ctx, rx.Holder, rx.TokenId); err != nil {
+				if _, err := destinationClient.contracts.erc721Token.Mint(ctx, rx.Holder, rx.TokenId); err != nil {
 					return err
 				}
 				log.Infof("minting token with Id %v and releasing it to address %v", rx.TokenId, rx.Holder)
 				return nil
 			}
 			// check if owner is custodial vault
-			if err := checkRetention(ctx, client, rx.TokenId); err != nil {
+			if err := checkRetention(ctx, destinationClient, rx.TokenId); err != nil {
 				return err
 			}
 
-			_, err = client.contracts.custodianVault.ReleaseToken(ctx, rx.Holder, rx.TokenId)
+			_, err = destinationClient.contracts.custodianVault.ReleaseToken(ctx, rx.Holder, rx.TokenId)
 			if err != nil {
 				return err
 			}
@@ -86,7 +76,7 @@ func (r Releaser) waitForFinality(ctx context.Context, client Client, rx event.R
 
 			return nil
 		}
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Millisecond * 500)
 	}
 }
 

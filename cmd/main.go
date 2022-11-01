@@ -55,10 +55,12 @@ func main() {
 		bsct.Contracts.ERC721TokenAddress,
 	)
 
+	clients := make(map[uint64]evm.Client)
+	clients[mumbai.ChainId] = mumbaiClient
+	clients[bsct.ChainId] = bsctClient
+
 	releaser := evm.Releaser{
-		//EthereumClient: goerliClient,
-		PolygonClient:  mumbaiClient,
-		BinanceClient:  bsctClient,
+		Clients: clients,
 	}
 
 	//goerliWs, err := ethclient.Dial(goerli.Ws)
@@ -77,7 +79,7 @@ func main() {
 	}
 	log.Infof("connection established to %v", mumbai.Ws)
 
-	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, releaser)
+	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, mumbai.ChainId, releaser)
 	go polygonListner.Listen(context.Background())
 
 	bscWs, err := ethclient.Dial(bsct.Ws)
@@ -86,7 +88,7 @@ func main() {
 	}
 	log.Infof("connection established to %v", bsct.Ws)
 
-	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, releaser)
+	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, bsct.ChainId, releaser)
 	go bscListner.Listen(context.Background())
 
 	ch := make(chan struct{})
@@ -110,5 +112,5 @@ func NewClient(http string, chainId, finality uint64, privateKey, custodialVault
 	if err != nil {
 		log.Fatalf("NewErc721TokenContract error: %v", err)
 	}
-	return evm.NewClient(conn, chainId, finality, custodian, erc721Token)
+	return evm.NewClient(conn, chainId, finality, custodian, erc721Token, transactor)
 }

@@ -18,13 +18,15 @@ import (
 type Listener struct {
 	conn     *ethclient.Client
 	contract common.Address
+	chainId *big.Int
 	releaser Releaser
 }
 
-func NewListener(conn *ethclient.Client, contractAddress string, releaser Releaser) Listener {
+func NewListener(conn *ethclient.Client, contractAddress string, chainId uint64, releaser Releaser) Listener {
 	return Listener{
 		conn:     conn,
 		contract: common.HexToAddress(contractAddress),
+		chainId: big.NewInt(int64(chainId)),
 		releaser: releaser,
 	}
 }
@@ -49,6 +51,7 @@ func (l Listener) Listen(ctx context.Context) error {
 			log.Infof("event received...")
 			tokenEvent, err := l.digestEvent(ctx, vLog)
 			if err != nil {
+				log.Fatalf("error digesting: %v", err)
 				return err
 			}
 
@@ -57,7 +60,8 @@ func (l Listener) Listen(ctx context.Context) error {
 				TxBlock:     vLog.BlockNumber,
 				TokenId:     tokenEvent.TokenId,
 				Holder:      tokenEvent.Holder.String(),
-				Destination: tokenEvent.Destination,
+				Origin: l.chainId,
+				Destination: tokenEvent.DestinationChainId,
 			}
 			log.Infof("event receipt %#v", l.contract.String())
 			go l.releaser.releaseToken(ctx, rx)
@@ -67,11 +71,13 @@ func (l Listener) Listen(ctx context.Context) error {
 
 func (l Listener) digestEvent(ctx context.Context, vLog types.Log) (*TokenCustodyEvent, error) {
 	log.Infof("digesting event %v", vLog.TxHash)
+	log.Infof("Topic hex is %v", vLog.Topics[0].Hex())
 	switch vLog.Topics[0].Hex() {
-	case tokenCustodySigHash.Hex():
+	case TokenCustodySigHash():
+		log.Infof("%v case...", TokenCustodySigHash())
 		contractAbi, err := abi.JSON(strings.NewReader(string(contract.CustosialVaultMetaData.ABI)))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("abi json error: %v", err)
 		}
 
 		var tokenCustodyEvent TokenCustodyEvent
@@ -83,6 +89,7 @@ func (l Listener) digestEvent(ctx context.Context, vLog types.Log) (*TokenCustod
 
 		return &tokenCustodyEvent, nil
 	default:
+		log.Warning("default case...")
 		return nil, fmt.Errorf("unknown event signature hash: %v", vLog.Topics[0].Hex())
 	}
 }

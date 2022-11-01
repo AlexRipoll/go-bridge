@@ -29,6 +29,7 @@ func NewClient(
 	chainId, finality uint64,
 	custodialVaultContract Custodian,
 	erc721TokenContract Erc721Token,
+	transactor ContractTransactor,
 	) Client {
 	return Client{
 		conn:       conn,
@@ -38,6 +39,7 @@ func NewClient(
 			custodianVault: custodialVaultContract,
 			erc721Token:    erc721TokenContract,
 		},
+		Transactor: transactor,
 	}
 }
 
