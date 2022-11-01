@@ -38,7 +38,7 @@ contract ERC721CustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
     * Emits a {TokenCustody} event.
     */
     function retainToken(uint256 tokenId, uint256 destination) public payable nonReentrant {
-        require(msg.value == txCost, "Not enough balance to complete transaction.");
+        require(msg.value >= txCost, "Not enough balance to complete transaction.");
         require(erc721token.ownerOf(tokenId) == msg.sender, "you must be the Token owner for executing this action");
         require(holdCustody[tokenId] == address(0), "Token already stored");
         holdCustody[tokenId] = msg.sender;

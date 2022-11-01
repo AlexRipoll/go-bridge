@@ -6,12 +6,20 @@ const privateKey = process.env["privateKey"];
 
 module.exports = {
     networks: {
-        // dev: {
-        //     host: "127.0.0.1",
-        //     port: 9545,
-        //     network_id: "*",
-        //     websockets: true
-        // },
+        develop: {
+            host: "127.0.0.1",
+            port: 9545,
+            network_id: "1337",
+            blockTime: 1,
+            websockets: true
+        },
+        develop2: {
+            host: "127.0.0.1",
+            port: 8545,
+            network_id: "97",
+            blockTime: 1,
+            websockets: true
+        },
         goerli: {
             provider: function() {
                 return new HDWalletProvider(privateKey, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
