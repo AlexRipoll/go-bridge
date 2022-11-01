@@ -17,6 +17,7 @@
 
 # config file with sensitive data
 config.yaml
+config.prod.yaml
 config.yml
 
 # IDE files
