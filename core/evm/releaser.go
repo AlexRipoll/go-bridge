@@ -68,6 +68,12 @@ func (r Releaser) waitForFinality(ctx context.Context, rx event.Rx) error {
 				return err
 			}
 
+			// updates the token owner in the holdCustody map if token has been transferred to another wallet
+			if err := updateOwner(ctx, destinationClient, rx.TokenId, rx.Holder); err != nil {
+				return err
+			}
+
+			time.Sleep(time.Second)
 			_, err = destinationClient.contracts.custodianVault.ReleaseToken(ctx, rx.Holder, rx.TokenId)
 			if err != nil {
 				return err
@@ -89,6 +95,28 @@ func checkRetention(ctx context.Context, client Client, tokenId *big.Int) error 
 	if owner != address {
 		return errors.New("token not retained in custody vault")
 	}
+
+	return nil
+}
+
+func updateOwner(ctx context.Context, client Client, tokenId *big.Int, sender string) error {
+	holder, err := client.contracts.custodianVault.TokenHolder(ctx, tokenId)
+	if err != nil {
+		log.Info("error fetching token %v holder: ", tokenId)
+		return err
+	}
+
+	if holder == sender {
+		return nil
+	}
+
+	tx, err := client.contracts.custodianVault.UpdateOwner(ctx, tokenId, sender)
+	if err != nil {
+		log.Info("error updating token %v ownership: ", tokenId)
+		return err
+	}
+	log.Infof("token %v holder updated from %v to %v", tokenId, holder, sender)
+	log.Infof("tx %#v", tx)
 
 	return nil
 }

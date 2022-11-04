@@ -14,6 +14,7 @@ type Erc721Token interface {
 	Exists(ctx context.Context, tokenId *big.Int) (bool, error)
 	OwnerOf(ctx context.Context, tokenId *big.Int) (string, error)
 	TokensOf(ctx context.Context, wallet string) ([]*big.Int, error)
+	TransferToken(ctx context.Context, from, to string, tokenId *big.Int) (*Tx, error)
 }
 
 type erc721TokenContract struct {
@@ -97,4 +98,19 @@ func (b erc721TokenContract) TokensOf(ctx context.Context, wallet string) ([]*bi
 	}
 
 	return tokenIds, err
+}
+
+func (b erc721TokenContract) TransferToken(ctx context.Context, from, to string, tokenId *big.Int) (*Tx, error) {
+	txOps, err := b.transactor.TransactOpts(ctx)
+	if err != nil {
+		return nil, err
+	}
+	gethTx, err := b.contract.TransferFrom(txOps, common.HexToAddress(from), common.HexToAddress(to), tokenId)
+	if err != nil {
+		return nil, err
+	}
+
+	tx := transactionToTx(gethTx)
+
+	return &tx, nil
 }

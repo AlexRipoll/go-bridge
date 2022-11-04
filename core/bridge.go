@@ -61,6 +61,15 @@ func (s Service) MintERC721Token(ctx context.Context, walletAddress string, toke
 	return toTx(tx), nil
 }
 
+func (s Service) TransferERC721Token(ctx context.Context, from, to string, tokenId *big.Int) (*Tx, error) {
+	tx, err := s.Erc721Token.TransferToken(ctx, from, to, tokenId)
+	if err != nil {
+		return nil, err
+	}
+
+	return toTx(tx), nil
+}
+
 func (s Service) burnERC721Token(ctx context.Context, origin string, tokenId *big.Int) (*Tx, error) {
 	tx, err := s.Erc721Token.Burn(ctx, tokenId)
 	if err != nil {
