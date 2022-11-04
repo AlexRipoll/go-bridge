@@ -50,10 +50,6 @@ contract ERC721CustodialVault is IERC721Receiver, ReentrancyGuard, Ownable {
         holdCustody[tokenId] = newHolder;
     }
 
-//    function heldCustody(uint256 tokenId) public view returns (address) {
-//        return holdCustody[tokenId].holder;
-//    }
-
     /**
     * @dev Releases a `tokenId` token hold in the `holdCustody` vault and transfers it to its owner's `wallet`.
     * to be released to the owner's wallet.
