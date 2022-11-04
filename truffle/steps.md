@@ -4,8 +4,24 @@
 ### BACK
     go run cmd/main.go
 
-    go run cmd/go-bridgecli/main.go --fn mint 0xCd1c0083BD35DDF4221bbC5Ee68fffBE3B8f0DE9 8
-    go run cmd/go-bridgecli/main.go --fn wallet 0xCd1c0083BD35DDF4221bbC5Ee68fffBE3B8f0DE9
+    go run cmd/go-bridgecli/main.go --fn mint 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4 2
+    go run cmd/go-bridgecli/main.go --fn mint 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4 4
+    go run cmd/go-bridgecli/main.go --fn mint 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4 8
+
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 1000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 2000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 3000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 4000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 5000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 6000
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 7000
+
+    go run cmd/go-bridgecli/main.go --fn transfer 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4 1000
+    go run cmd/go-bridgecli/main.go --fn transfer 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4 2000
+
+    go run cmd/go-bridgecli/main.go --fn wallet 0xAa573B03B6E4506C811Eb7Bf1EEa685d224087b4
+    go run cmd/go-bridgecli/main.go --fn wallet 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88
+
 
 ### TRUFFLE
     truffle migrate --reset --network develop
