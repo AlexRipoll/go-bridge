@@ -81,6 +81,20 @@ func main() {
 				log.Fatalf("error fetching tokens: %v", err)
 			}
 			fmt.Println("Token Ids: ", tokens)
+		case "transfer":
+			fromAddress := flag.Arg(1)
+			toAddress := flag.Arg(2)
+			tokenIdArg := flag.Arg(3)
+			tokenId, err := strconv.Atoi(tokenIdArg)
+			if err != nil {
+				log.Fatalf("%v is not an integer", tokenIdArg)
+			}
+
+			tx, err := service.TransferERC721Token(context.Background(), fromAddress, toAddress, big.NewInt(int64(tokenId)))
+			if err != nil {
+				log.Fatal(" error minting token: ", err)
+			}
+			fmt.Println(fmt.Sprintf("%#v", tx))
 		default:
 			log.Fatalf("unknow method: %s", flag.Arg(0))
 		}
