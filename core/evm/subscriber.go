@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/contract"
 	"github.com/AlexRipoll/go-bridge/core/event"
+	"github.com/AlexRipoll/go-bridge/sys/storage"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -20,14 +21,16 @@ type Listener struct {
 	contract common.Address
 	chainId  *big.Int
 	releaser Releaser
+	db storage.Db
 }
 
-func NewListener(conn *ethclient.Client, contractAddress string, chainId uint64, releaser Releaser) Listener {
+func NewListener(conn *ethclient.Client, contractAddress string, chainId uint64, releaser Releaser, db storage.Db) Listener {
 	return Listener{
 		conn:     conn,
 		contract: common.HexToAddress(contractAddress),
 		chainId:  big.NewInt(int64(chainId)),
 		releaser: releaser,
+		db: db,
 	}
 }
 
@@ -63,6 +66,22 @@ func (l Listener) Listen(ctx context.Context) error {
 				Origin:      l.chainId,
 				Destination: tokenEvent.DestinationChainId,
 			}
+
+			buf, err := rx.Bytes()
+			if err != nil {
+				return err
+			}
+
+			key := make([]byte, len(l.chainId.Bytes())+len(rx.TxHash))
+			key = append(l.chainId.Bytes())
+			key = append(key, rx.TxHash[:]...)
+			if err := l.db.Put(key, buf); err != nil {
+				return err
+			}
+			if err := l.db.Put([]byte(LatestBlockNumber),big.NewInt(int64(rx.TxBlock)).Bytes()); err != nil {
+				return err
+			}
+
 			log.Infof("event receipt %#v", l.contract.String())
 			go l.releaser.releaseToken(ctx, rx)
 		}

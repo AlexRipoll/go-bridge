@@ -7,6 +7,8 @@ import (
 	"math/big"
 )
 
+const LatestBlockNumber = "block#"
+
 type TokenCustodyEvent struct {
 	TokenId            *big.Int
 	Holder             common.Address

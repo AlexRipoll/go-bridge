@@ -6,7 +6,7 @@ type levelDB struct {
 	db *leveldb.DB
 }
 
-func NewLevelDB(path string) (*levelDB, error) {
+func NewLevelDB(path string) (Db, error) {
 	db, err := leveldb.OpenFile(path, nil)
 	if err != nil {
 		return nil, err
@@ -24,4 +24,8 @@ func (l levelDB) Get(key []byte) ([]byte, error) {
 
 func (l levelDB) Put(key, value []byte) error {
 	return l.db.Put(key, value, nil)
+}
+
+func (l levelDB) Delete(key []byte) error {
+	return l.db.Delete(key, nil)
 }

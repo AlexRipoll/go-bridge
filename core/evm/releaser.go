@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/core/event"
+	"github.com/AlexRipoll/go-bridge/sys/storage"
 	log "github.com/sirupsen/logrus"
 	"math/big"
 	"time"
@@ -12,6 +13,7 @@ import (
 
 type Releaser struct {
 	Clients map[uint64]Client
+	db storage.Db
 }
 
 func (r Releaser) releaseToken(ctx context.Context, rx event.Rx) error {
@@ -21,6 +23,14 @@ func (r Releaser) releaseToken(ctx context.Context, rx event.Rx) error {
 		log.Error(fmt.Sprintf("wait for finality error (ethereum): %v", err.Error()))
 		return err
 	}
+
+	key := make([]byte, len(rx.Origin.Bytes())+len(rx.TxHash))
+	key = append(rx.Origin.Bytes())
+	key = append(key, rx.TxHash[:]...)
+	if err := r.db.Delete(key); err != nil {
+		return err
+	}
+
 	return nil
 }
 
