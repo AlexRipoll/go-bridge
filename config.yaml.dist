@@ -2,29 +2,28 @@
 # DO NOT SHARE THIS FILE WITH ANYONE
 
 privatekey: "d84..."
-networks:
-  goerli:
-    http: "https://goerli.infura.io/v3/{API_KEY}"
-    ws: "wss://goerli.infura.io/ws/v3/{API_KEY}"
-    chainId: 5
-    blockFinality: 10
-    contracts:
-      erc721Token: "0xf0444..."
-      custodialVault: "0x8D1b..."
-  mumbai:
-    http: "https://matic-mumbai.chainstacklabs.com"
-    ws: "..."
-    chainId: 80001
-    blockFinality: 10
-    contracts:
-      erc721Token: "..."
-      custodialVault: "..."
-  bsct:
-    http: "https://data-seed-prebsc-1-s1.binance.org:8545"
-    ws: "..."
-    chainId: 97
-    blockFinality: 10
-    contracts:
-      erc721Token: "..."
-      custodialVault: "..."
+goerli:
+  http: "https://goerli.infura.io/v3/{API_KEY}"
+  ws: "wss://goerli.infura.io/ws/v3/{API_KEY}"
+  chainId: 5
+  blockFinality: 10
+  contracts:
+    erc721TokenAddress: "0xf0444..."
+    custodialVaultAddress: "0x8D1b..."
+mumbai:
+  http: "https://matic-mumbai.chainstacklabs.com"
+  ws: "..."
+  chainId: 80001
+  blockFinality: 10
+  contracts:
+    erc721TokenAddress: "..."
+    custodialVaultAddress: "..."
+bsct:
+  http: "https://data-seed-prebsc-1-s1.binance.org:8545"
+  ws: "..."
+  chainId: 97
+  blockFinality: 10
+  contracts:
+    erc721TokenAddress: "..."
+    custodialVaultAddress: "..."
 
