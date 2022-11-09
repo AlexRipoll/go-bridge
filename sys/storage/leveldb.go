@@ -1,6 +1,9 @@
 package storage
 
-import "github.com/syndtr/goleveldb/leveldb"
+import (
+	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/util"
+)
 
 type levelDB struct {
 	db *leveldb.DB
@@ -28,4 +31,19 @@ func (l levelDB) Put(key, value []byte) error {
 
 func (l levelDB) Delete(key []byte) error {
 	return l.db.Delete(key, nil)
+}
+
+func (l levelDB) GetAllKeys() [][]byte {
+	var keys [][]byte
+	iterator := l.db.NewIterator(&util.Range{
+		Start: nil,
+		Limit: nil,
+	}, nil)
+	defer iterator.Release()
+
+	for iterator.Next() {
+		keys = append(keys, iterator.Key())
+	}
+
+	return keys
 }

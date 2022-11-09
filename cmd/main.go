@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/AlexRipoll/go-bridge/config"
 	"github.com/AlexRipoll/go-bridge/core/evm"
+	"github.com/AlexRipoll/go-bridge/sys/storage"
 	"github.com/ethereum/go-ethereum/ethclient"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,6 +21,11 @@ func main() {
 	// docs
 
 	config, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db, err := storage.NewLevelDB("./")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,6 +78,8 @@ func main() {
 	//ethListner := evm.NewListener(goerliWs, goerli.Contracts.CustodialVaultAddress, releaser)
 	//go ethListner.Listen(context.Background())
 
+	go evm.RecoverFromShutDown(context.Background(), db, releaser)
+
 	fmt.Println(mumbai.Ws)
 	polWs, err := ethclient.Dial(mumbai.Ws)
 	if err != nil {
@@ -79,7 +87,7 @@ func main() {
 	}
 	log.Infof("connection established to %v", mumbai.Ws)
 
-	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, mumbai.ChainId, releaser)
+	polygonListner := evm.NewListener(polWs, mumbai.Contracts.CustodialVaultAddress, mumbai.ChainId, releaser, db)
 	go polygonListner.Listen(context.Background())
 
 	bscWs, err := ethclient.Dial(bsct.Ws)
@@ -88,7 +96,7 @@ func main() {
 	}
 	log.Infof("connection established to %v", bsct.Ws)
 
-	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, bsct.ChainId, releaser)
+	bscListner := evm.NewListener(bscWs, bsct.Contracts.CustodialVaultAddress, bsct.ChainId, releaser, db)
 	go bscListner.Listen(context.Background())
 
 	ch := make(chan struct{})
