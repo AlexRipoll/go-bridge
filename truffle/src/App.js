@@ -20,6 +20,10 @@ import ERC721Token from "../build/contracts/ERC721Token.json"
 //   const account = accounts[0];
 //   showAccount.innerHTML = account;
 // }
+
+const polygonNetId = 1337;
+const binanceNetId = 97;
+
 const Dropdown = ({ label, value, options, onChange }) => {
     return (
         <label>
@@ -44,6 +48,7 @@ function App() {
     const [sourceValue, setSourceValue] = React.useState('ethereum');
     const handleSourceChange = (event) => {
         setSourceValue(event.target.value);
+        console.log("SOURCE NOW IS: ", event.target.value);
     };
     const [destinationValue, setDestinationValue] = React.useState('polygon');
     const handleDestinationChange = (event) => {
@@ -103,8 +108,47 @@ function App() {
         return provider
     }
 
+    const checkNetwork = async function(selectedNetId) {
+        // Check if MetaMask is installed
+        // MetaMask injects the global API into window.ethereum
+        if (window.ethereum) {
+            try {
+                // check if the chain to connect to is installed
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: `0x${selectedNetId.toString(16)}` }], // chainId must be in hexadecimal numbers
+                });
+            } catch (error) {
+                // This error code indicates that the chain has not been added to MetaMask
+                // if it is not, then install it into the user MetaMask
+                if (error.code === 4902) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [
+                                {
+                                    chainId: '0x61',
+                                    rpcUrl: 'https://data-seed-prebsc-1-s1.binance.org:8545/',
+                                },
+                            ],
+                        });
+                    } catch (addError) {
+                        console.error(addError);
+                    }
+                }
+                console.error(error);
+            }
+        } else {
+            // if no window.ethereum then MetaMask is not installed
+            alert('MetaMask is not installed. Please consider installing it: https://metamask.io/download.html');
+        }
+    }
+
     const retrieveTokens = async () => {
-        const networkId = await web3.eth.net.getId()
+        // const networkId = await web3.eth.net.getId()
+        let networkId = await getSelectedNetworkId(sourceValue);
+
+        await checkNetwork(networkId);
         const rpc = await providerRpc(networkId);
         console.log("RPC: ", rpc);
         const provider = new Web3(rpc);
@@ -131,67 +175,85 @@ function App() {
 
     // TODO ask to switch network when mismatch between wallet network and select value
 
+    const getSelectedNetworkId = async (selectedValue) => {
+        let networkId;
+        if (selectedValue == "polygon") {
+            networkId = polygonNetId;
+            console.log("NET ID selected is: ", networkId);
+        } else if (selectedValue == "binance") {
+            networkId = binanceNetId;
+            console.log("NET ID selected is: ", networkId);
+        }
+        return networkId;
+    }
+
     // TODO
     const transfer = async () => {
         //https://ethereum.stackexchange.com/questions/91510/call-contract-view-method-from-web3
         // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html
 
-            const networkId = await web3.eth.net.getId()
-            console.log("NETWORKID: ", networkId)
-            const rpc = await providerRpc(networkId);
-            console.log("RPC: ", rpc)
-            const provider = new Web3(rpc);
-            const networkData = CustodialVault.networks[networkId];
-            const erc721TokenNetworkData = ERC721Token.networks[networkId];
-            console.log("PROVIDER ", provider)
-            console.log("NETWORKDATA", networkData)
+        // TODO alert if source == destination
 
-            // TODO set destination from select
-            const destination = 1337;
-            // TODO set tokenId from selected token from front
-            const tokenId = 3000;
+        const networkId = await getSelectedNetworkId(sourceValue);
 
-            const accounts = await web3.eth.requestAccounts();
-            if (networkData) {
-                console.log("network data")
-                const CustodialVaultAbi = CustodialVault.abi;
-                const address = networkData.address;
-                const contract = new web3.eth.Contract(CustodialVaultAbi, address);
+        await checkNetwork(networkId);
 
-                const ERC721TokenAbi = ERC721Token.abi;
-                const erc721TokenAddress = erc721TokenNetworkData.address;
-                const erc721TokenContract = new web3.eth.Contract(ERC721TokenAbi, erc721TokenAddress);
+        console.log("NETWORKID: ", networkId)
+        const rpc = await providerRpc(networkId);
+        console.log("RPC: ", rpc)
+        const provider = new Web3(rpc);
+        const networkData = CustodialVault.networks[networkId];
+        const erc721TokenNetworkData = ERC721Token.networks[networkId];
+        console.log("PROVIDER ", provider)
+        console.log("NETWORKDATA", networkData)
 
-                // const approved = await erc721TokenContract.methods.approve(address, tokenId).send({from: accounts[0]});
-                const isApproved = await erc721TokenContract.methods.isApprovedForAll(accounts[0], address).call({from: accounts[0]});
-                console.log(">>>> IS APPROVED: ", isApproved, " <<<<");
-                if (!isApproved) {
-                    const approve = await erc721TokenContract.methods.setApprovalForAll(address, true).send({from: accounts[0], gasPrice: 30000000000});
-                    console.log("APPROVE: ", approve);
-                }
+        const destination = await getSelectedNetworkId(destinationValue);
+        console.log("DESTINATION VALUE IS: ", destination);
 
-                console.log("Address", address);
-                console.log("contract", contract);
+        // TODO set tokenId from selected token from front
+        const tokenId = 3000;
 
-                const estimateGasPrice = await contract.methods.retainToken(tokenId, destination).estimateGas({from: accounts[0], value: 1000});
-                console.log("ESTIMATED GAS PRICE: ", estimateGasPrice)
-                console.log("==== ", await contract.methods.holdCustody(tokenId).call());
-                contract.methods.retainToken(tokenId, destination).send({
-                    from: accounts[0],
-                    value: 1000,
-                    gasPrice: 30000000000,
-                })
-                .on('receipt', function(receipt){
-                    console.log(receipt)
-                })
-                .on('error', function(error){
-                    console.log("RETAIN TOKEN ERROR: ", error)
-                })
+        const accounts = await web3.eth.requestAccounts();
+        if (networkData) {
+            console.log("network data")
+            const CustodialVaultAbi = CustodialVault.abi;
+            const address = networkData.address;
+            const contract = new web3.eth.Contract(CustodialVaultAbi, address);
 
-                ;
-                // console.log("RETAIN TOKEN TX: ", tx);
-                // TODO print tokens in front (must be selectable)
+            const ERC721TokenAbi = ERC721Token.abi;
+            const erc721TokenAddress = erc721TokenNetworkData.address;
+            const erc721TokenContract = new web3.eth.Contract(ERC721TokenAbi, erc721TokenAddress);
+
+            // const approved = await erc721TokenContract.methods.approve(address, tokenId).send({from: accounts[0]});
+            const isApproved = await erc721TokenContract.methods.isApprovedForAll(accounts[0], address).call({from: accounts[0]});
+            console.log(">>>> IS APPROVED: ", isApproved, " <<<<");
+            if (!isApproved) {
+                const approve = await erc721TokenContract.methods.setApprovalForAll(address, true).send({from: accounts[0], gasPrice: 30000000000});
+                console.log("APPROVE: ", approve);
             }
+
+            console.log("Address", address);
+            console.log("contract", contract);
+
+            const estimateGasPrice = await contract.methods.retainToken(tokenId, destination).estimateGas({from: accounts[0], value: 1000});
+            console.log("ESTIMATED GAS PRICE: ", estimateGasPrice)
+            console.log("==== ", await contract.methods.holdCustody(tokenId).call());
+            contract.methods.retainToken(tokenId, destination).send({
+                from: accounts[0],
+                value: 1000,
+                gasPrice: 30000000000,
+            })
+            .on('receipt', function(receipt){
+                console.log(receipt)
+            })
+            .on('error', function(error){
+                console.log("RETAIN TOKEN ERROR: ", error)
+            })
+
+            ;
+            // console.log("RETAIN TOKEN TX: ", tx);
+            // TODO print tokens in front (must be selectable)
+        }
     }
 
     // logging()
