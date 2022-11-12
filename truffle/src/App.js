@@ -1,4 +1,7 @@
 import React, { Fragment, useState } from "react";
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from './logo.svg';
 import './App.css';
 import logging from './bridge'
@@ -173,6 +176,22 @@ function App() {
 
     }
 
+    const printTokens = async (list) => {
+        const cards = list.map((item) => {
+            <li>newCard(item.id)</li>
+        });
+        return cards;
+    }
+
+    const newCard = function (tokenId) {
+        return `<Card style={{ width: '8rem' }}>
+        <Card.Img variant="top" src="https://via.placeholder.com/150" />
+          <Card.Body>
+            <Card.Title>${tokenId}</Card.Title>
+          </Card.Body>
+        </Card>`
+    }
+
     // TODO ask to switch network when mismatch between wallet network and select value
 
     const getSelectedNetworkId = async (selectedValue) => {
@@ -259,8 +278,8 @@ function App() {
     // logging()
     return (
         <Fragment>
-            <button className="enableEthereumButton" onClick={connect}>Connect wallet</button>
-            <h2>Wallet Address: <span className="showAccount">{addressValue} </span></h2>
+            <Button variant="dark" className="enableEthereumButton" onClick={connect}>Connect wallet</Button>
+            <h5>Wallet Address: <span className="showAccount">{addressValue} </span></h5>
             <div>
                 <Dropdown
                     label="Source Blockchain"
@@ -269,8 +288,12 @@ function App() {
                     onChange={handleSourceChange}
                 />
                 <p>These are your ERC721 tokens on {sourceValue} </p>
-                <button className="retrieveTokens" onClick={retrieveTokens}>Retrieve Tokens</button>
+                <Button variant="primary" className="retrieveTokens" onClick={retrieveTokens}>Retrieve Tokens</Button>
             </div>
+            <div>
+                {/* TODO print cards*/}
+            </div>
+
             <div>
                 <Dropdown
                     label="Destination Blockchain"
@@ -278,8 +301,8 @@ function App() {
                     value={destinationValue}
                     onChange={handleDestinationChange}
                 />
-                <p>The destination blockchain is {destinationValue} </p>
-                <button className="transferToken" onClick={transfer}>Transfer Token</button>
+                <p></p>
+                <Button variant="primary" className="transferToken" onClick={transfer}>Transfer Token</Button>
             </div>
 
         </Fragment>
