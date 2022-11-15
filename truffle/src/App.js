@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from "react";
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import logo from './logo.svg';
 import './App.css';
@@ -29,16 +31,29 @@ const binanceNetId = 97;
 
 const Dropdown = ({ label, value, options, onChange }) => {
     return (
-        <label>
-            {label}
-            <select value={value} onChange={onChange}>
+        <Form.Group>
+            <Form.Label>{label}</Form.Label>
+            <Form.Select value={value} onChange={onChange}>
                 {options.map((option) => (
                     <option value={option.value}>{option.label}</option>
                 ))}
-            </select>
-        </label>
+            </Form.Select>
+        </Form.Group>
     );
 };
+
+const TokenCard = function ({tokenId, selectedId, onClick}) {
+    const isSelected = selectedId === tokenId;
+    return (
+        <Card style={{ width: '8rem' }}>
+            <Card.Img variant="top" src="https://via.placeholder.com/150" />
+            <Card.Body>
+                <Card.Title>${tokenId}</Card.Title>
+                <Button disabled={isSelected} onClick={onClick}>Select</Button>
+            </Card.Body>
+        </Card>
+    );
+}
 
 function App() {
     const web3 = new Web3(window.ethereum);
@@ -63,18 +78,26 @@ function App() {
         setAddressValue(event.target.value);
     };
 
+    const [retrievedTokens, setRetrievedTokens ] = useState([]);
+
+    const [selectedToken, setSelectedToken] = useState();
+
     const address = async () => {
         const accounts = web3.eth.requestAccounts().then(console.log);
         return await web3.eth.getBalance(accounts[0]).address;
     }
 
+    const isConnected = !!addressValue;
+
+    console.log({selectedToken, addressValue, sourceValue, destinationValue})
 
     const connect = async () => {
         return new Promise(async (resolve, reject)=> {
             try {
-                await window.ethereum.request({method: "eth_requestAccounts"})
-                resolve(web3)
-                setAddressValue(await address());
+                const [address] = await window.ethereum.request({method: "eth_requestAccounts"})
+                setAddressValue(address);
+                //resolve(web3)
+
             } catch (error) {
                 reject(error)
             }
@@ -148,6 +171,8 @@ function App() {
     }
 
     const retrieveTokens = async () => {
+        const tokenIds = [1,2,3,4];
+        return setRetrievedTokens(tokenIds);
         // const networkId = await web3.eth.net.getId()
         let networkId = await getSelectedNetworkId(sourceValue);
 
@@ -159,19 +184,19 @@ function App() {
         console.log("PROVIDER ", provider)
         console.log("NETWORKDATA", networkData)
 
-        const accounts = await web3.eth.requestAccounts();
         if(networkData) {
             console.log("network data");
             const ERC721TokenAbi = ERC721Token.abi;
             const address = networkData.address;
             const contract = new web3.eth.Contract(ERC721TokenAbi, address);
-            const walletTokens = await contract.methods.walletOfOwner(accounts[0]).call();
-            console.log(`${accounts[0]} tokens: ${walletTokens}`);
+            const walletTokens = await contract.methods.walletOfOwner(addressValue).call();
+            console.log(`${addressValue} tokens: ${walletTokens}`);
 
             const vaultNetworkData = CustodialVault.networks[networkId];
             const vaultTokens = await contract.methods.walletOfOwner(vaultNetworkData.address).call();
             console.log(`Custodial Vault tokens: ${vaultTokens}`);
             // TODO print tokens in front (must be selectable)
+            setRetrievedTokens(vaultTokens);
         }
 
     }
@@ -183,16 +208,10 @@ function App() {
         return cards;
     }
 
-    const newCard = function (tokenId) {
-        return `<Card style={{ width: '8rem' }}>
-        <Card.Img variant="top" src="https://via.placeholder.com/150" />
-          <Card.Body>
-            <Card.Title>${tokenId}</Card.Title>
-          </Card.Body>
-        </Card>`
-    }
+
 
     // TODO ask to switch network when mismatch between wallet network and select value
+
 
     const getSelectedNetworkId = async (selectedValue) => {
         let networkId;
@@ -277,35 +296,48 @@ function App() {
 
     // logging()
     return (
-        <Fragment>
-            <Button variant="dark" className="enableEthereumButton" onClick={connect}>Connect wallet</Button>
-            <h5>Wallet Address: <span className="showAccount">{addressValue} </span></h5>
-            <div>
+        <Modal show centered >
+            <Modal.Body>
+
+            <h5>Wallet Address:</h5>
+            <p className="showAccount">{ isConnected ? addressValue : 'Not Connected'} </p>
+
+                {!!retrievedTokens?.length && <>
+                    <h5>Wallet Tokens:</h5>
+                    <div className={"d-flex justify-content-between gap-2 mb-4"}>
+                    {retrievedTokens.map((id) => <TokenCard tokenId={id} selectedId={selectedToken} onClick={() => setSelectedToken(id)} />)}
+                    </div>
+                </>}
+
+
+            <div className={"d-flex justify-content-between"}>
                 <Dropdown
                     label="Source Blockchain"
                     options={options}
                     value={sourceValue}
                     onChange={handleSourceChange}
+                    disabled={!isConnected}
                 />
-                <p>These are your ERC721 tokens on {sourceValue} </p>
-                <Button variant="primary" className="retrieveTokens" onClick={retrieveTokens}>Retrieve Tokens</Button>
-            </div>
-            <div>
-                {/* TODO print cards*/}
-            </div>
-
-            <div>
                 <Dropdown
                     label="Destination Blockchain"
                     options={options}
                     value={destinationValue}
                     onChange={handleDestinationChange}
+                    disabled={!isConnected}
                 />
                 <p></p>
-                <Button variant="primary" className="transferToken" onClick={transfer}>Transfer Token</Button>
             </div>
-
-        </Fragment>
+            </Modal.Body>
+            <Modal.Footer className={"d-flex justify-content-between"}>
+                {!isConnected && <Button variant="dark" className="enableEthereumButton" onClick={connect}>Connect wallet</Button>}
+                { isConnected &&
+                    <>
+                        <Button variant="primary" className="retrieveTokens" onClick={retrieveTokens}>Retrieve Tokens</Button>
+                        <Button variant="primary" className="transferToken" onClick={transfer}>Transfer Token</Button>
+                    </>
+                }
+            </Modal.Footer>
+        </Modal>
 );
 }
 
