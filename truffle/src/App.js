@@ -13,18 +13,6 @@ import CustodialVault from "../build/contracts/ERC721CustodialVault.json"
 import ERC721Token from "../build/contracts/ERC721Token.json"
 
 
-// const ethereumButton = document.querySelector('.enableEthereumButton');
-// const showAccount = document.querySelector('.showAccount');
-//
-// ethereumButton.addEventListener('click', () => {
-//   getAccount();
-// });
-//
-// async function getAccount() {
-//   const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-//   const account = accounts[0];
-//   showAccount.innerHTML = account;
-// }
 
 const polygonNetId = 1337;
 const binanceNetId = 97;
@@ -171,8 +159,8 @@ function App() {
     }
 
     const retrieveTokens = async () => {
-        const tokenIds = [1,2,3,4];
-        return setRetrievedTokens(tokenIds);
+        // const tokenIds = [1,2,3,4];
+        // return setRetrievedTokens(tokenIds);
         // const networkId = await web3.eth.net.getId()
         let networkId = await getSelectedNetworkId(sourceValue);
 
@@ -249,7 +237,9 @@ function App() {
         console.log("DESTINATION VALUE IS: ", destination);
 
         // TODO set tokenId from selected token from front
-        const tokenId = 3000;
+        // const tokenId = 3000;
+        const tokenId = selectedToken;
+        console.log("TOKEN ID TO TRANSFER: ", tokenId);
 
         const accounts = await web3.eth.requestAccounts();
         if (networkData) {
