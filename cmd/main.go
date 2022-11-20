@@ -12,20 +12,13 @@ import (
 
 func main() {
 	log.Info("initializing process...")
-	// add tests
-	// update config
-	// move code to service
-	// recovery system (DB...)
-	// logging
-	// update function
-	// docs
 
 	config, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := storage.NewLevelDB("./")
+	db, err := storage.NewLevelDB("./leveldb")
 	if err != nil {
 		log.Fatal(err)
 	}
