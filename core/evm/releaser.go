@@ -24,13 +24,6 @@ func (r Releaser) releaseToken(ctx context.Context, rx event.Rx) error {
 		return err
 	}
 
-	key := make([]byte, len(rx.Origin.Bytes())+len(rx.TxHash))
-	key = append(rx.Origin.Bytes())
-	key = append(key, rx.TxHash[:]...)
-	if err := r.db.Delete(key); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -56,13 +49,7 @@ func (r Releaser) waitForFinality(ctx context.Context, rx event.Rx) error {
 		if err != nil {
 			return err
 		}
-		log.Infof("current block number: %v", currentBlock)
-		log.Infof("TX block number: %v", rx.TxBlock)
-		log.Infof("block amount left for reaching finality: %v", currentBlock-rx.TxBlock)
-		log.Info("----------------------------------------------")
-		log.Info(currentBlock - rx.TxBlock)
-		log.Info((currentBlock - rx.TxBlock) >= destinationClient.Finality())
-		log.Info("----------------------------------------------")
+		log.Infof("current block number: %v (%v blocks left for reaching finality)", currentBlock, destinationClient.finality - (currentBlock-rx.TxBlock))
 
 		if (currentBlock - rx.TxBlock) >= destinationClient.Finality() {
 			log.Infof("finality reached")

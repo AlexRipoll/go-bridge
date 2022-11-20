@@ -3,7 +3,6 @@ package evm
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/AlexRipoll/go-bridge/core/event"
 	"github.com/AlexRipoll/go-bridge/sys/storage"
 	log "github.com/sirupsen/logrus"
@@ -12,7 +11,6 @@ import (
 func RecoverFromShutDown(ctx context.Context, db storage.Db, releaser Releaser) error {
 	log.Infof("initializing recovery...")
 	keys := db.GetAllKeys()
-	fmt.Println("UNPROCESSED KEYS: ", keys)
 
 	if len(keys) == 0 {
 		log.Infof("nothing to recover...")
