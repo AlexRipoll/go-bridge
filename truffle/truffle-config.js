@@ -20,6 +20,13 @@ module.exports = {
             blockTime: 1,
             websockets: true
         },
+        develop3: {
+            host: "127.0.0.1",
+            port: 7545,
+            network_id: "5",
+            blockTime: 1,
+            websockets: true
+        },
         goerli: {
             provider: function() {
                 return new HDWalletProvider(privateKey, "https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
