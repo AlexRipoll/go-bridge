@@ -14,8 +14,9 @@ import ERC721Token from "../build/contracts/ERC721Token.json"
 
 
 
-const polygonNetId = 1337;
-const binanceNetId = 97;
+const ethereumNetId = process.env.REACT_APP_ethereumNetId;
+const polygonNetId = process.env.REACT_APP_polygonNetId;
+const binanceNetId = process.env.REACT_APP_binanceNetId;
 
 const Dropdown = ({ label, value, options, onChange }) => {
     return (
@@ -36,7 +37,7 @@ const TokenCard = function ({tokenId, selectedId, onClick}) {
         <Card style={{ width: '8rem' }}>
             <Card.Img variant="top" src="https://via.placeholder.com/150" />
             <Card.Body>
-                <Card.Title>${tokenId}</Card.Title>
+                <Card.Title>{tokenId}</Card.Title>
                 <Button disabled={isSelected} onClick={onClick}>Select</Button>
             </Card.Body>
         </Card>
@@ -54,7 +55,6 @@ function App() {
     const [sourceValue, setSourceValue] = React.useState('ethereum');
     const handleSourceChange = (event) => {
         setSourceValue(event.target.value);
-        console.log("SOURCE NOW IS: ", event.target.value);
     };
     const [destinationValue, setDestinationValue] = React.useState('polygon');
     const handleDestinationChange = (event) => {
@@ -93,28 +93,16 @@ function App() {
     }
 
     const providerRpc = async (chainId) => {
-        const goerliChainId = Number(process.env.REACT_APP_goerliChainId);
-        const mumbaiChainId = Number(process.env.REACT_APP_mumbaiChainId);
-        const bsctChainId = Number(process.env.REACT_APP_bsctChainId);
-        console.log("Ci: ", chainId);
-        console.log("G: ", goerliChainId);
-        console.log("M: ", mumbaiChainId);
-        console.log("B: ", bsctChainId);
         let provider;
         switch(chainId) {
-            // case goerliChainId:
-            //     provider = process.env.REACT_APP_goerliRpc;
-            //     break;
-            case mumbaiChainId:
-                provider = process.env.REACT_APP_mumbaiRpc;
+            case ethereumNetId:
+                provider = process.env.REACT_APP_ethereumRpc;
                 break;
-            case 97:
-                provider = "http://localhost:8545";
-
+            case binanceNetId:
+                provider = process.env.REACT_APP_binanceRpc;
                 break;
-            case 1337:
-                provider = "http://localhost:9545";
-
+            case polygonNetId:
+                provider = process.env.REACT_APP_polygonRpc;
                 break;
             default:
             throw new Error("unsupported network")
@@ -159,32 +147,26 @@ function App() {
     }
 
     const retrieveTokens = async () => {
-        // const tokenIds = [1,2,3,4];
-        // return setRetrievedTokens(tokenIds);
-        // const networkId = await web3.eth.net.getId()
         let networkId = await getSelectedNetworkId(sourceValue);
 
         await checkNetwork(networkId);
         const rpc = await providerRpc(networkId);
-        console.log("RPC: ", rpc);
         const provider = new Web3(rpc);
         const networkData = ERC721Token.networks[networkId];
-        console.log("PROVIDER ", provider)
-        console.log("NETWORKDATA", networkData)
 
         if(networkData) {
-            console.log("network data");
             const ERC721TokenAbi = ERC721Token.abi;
             const address = networkData.address;
             const contract = new web3.eth.Contract(ERC721TokenAbi, address);
             const walletTokens = await contract.methods.walletOfOwner(addressValue).call();
-            console.log(`${addressValue} tokens: ${walletTokens}`);
+            console.log(`>>>> ${addressValue} tokens: ${walletTokens}`);
 
             const vaultNetworkData = CustodialVault.networks[networkId];
             const vaultTokens = await contract.methods.walletOfOwner(vaultNetworkData.address).call();
-            console.log(`Custodial Vault tokens: ${vaultTokens}`);
+            console.log(`>>>> custodial Vault tokens: ${vaultTokens}`);
             // TODO print tokens in front (must be selectable)
-            setRetrievedTokens(vaultTokens);
+            setRetrievedTokens(walletTokens);
+            console.log(`>>>> wallet tokens: ${walletTokens}`);
         }
 
     }
@@ -197,53 +179,36 @@ function App() {
     }
 
 
-
-    // TODO ask to switch network when mismatch between wallet network and select value
-
-
     const getSelectedNetworkId = async (selectedValue) => {
         let networkId;
         if (selectedValue == "polygon") {
             networkId = polygonNetId;
-            console.log("NET ID selected is: ", networkId);
         } else if (selectedValue == "binance") {
             networkId = binanceNetId;
-            console.log("NET ID selected is: ", networkId);
+        } else if (selectedValue == "ethereum") {
+            networkId = binanceNetId;
         }
+        console.log(">>>> net id: ", networkId);
+
         return networkId;
     }
 
-    // TODO
     const transfer = async () => {
         //https://ethereum.stackexchange.com/questions/91510/call-contract-view-method-from-web3
         // https://web3js.readthedocs.io/en/v1.2.11/web3-eth-contract.html
 
-        // TODO alert if source == destination
-
         const networkId = await getSelectedNetworkId(sourceValue);
 
         await checkNetwork(networkId);
-
-        console.log("NETWORKID: ", networkId)
         const rpc = await providerRpc(networkId);
-        console.log("RPC: ", rpc)
         const provider = new Web3(rpc);
         const networkData = CustodialVault.networks[networkId];
         const erc721TokenNetworkData = ERC721Token.networks[networkId];
-        console.log("PROVIDER ", provider)
-        console.log("NETWORKDATA", networkData)
 
         const destination = await getSelectedNetworkId(destinationValue);
-        console.log("DESTINATION VALUE IS: ", destination);
-
-        // TODO set tokenId from selected token from front
-        // const tokenId = 3000;
-        const tokenId = selectedToken;
-        console.log("TOKEN ID TO TRANSFER: ", tokenId);
 
         const accounts = await web3.eth.requestAccounts();
         if (networkData) {
-            console.log("network data")
             const CustodialVaultAbi = CustodialVault.abi;
             const address = networkData.address;
             const contract = new web3.eth.Contract(CustodialVaultAbi, address);
@@ -252,21 +217,14 @@ function App() {
             const erc721TokenAddress = erc721TokenNetworkData.address;
             const erc721TokenContract = new web3.eth.Contract(ERC721TokenAbi, erc721TokenAddress);
 
-            // const approved = await erc721TokenContract.methods.approve(address, tokenId).send({from: accounts[0]});
             const isApproved = await erc721TokenContract.methods.isApprovedForAll(accounts[0], address).call({from: accounts[0]});
-            console.log(">>>> IS APPROVED: ", isApproved, " <<<<");
+            console.log(">>>> is approved: ", isApproved);
             if (!isApproved) {
                 const approve = await erc721TokenContract.methods.setApprovalForAll(address, true).send({from: accounts[0], gasPrice: 30000000000});
-                console.log("APPROVE: ", approve);
             }
 
-            console.log("Address", address);
-            console.log("contract", contract);
-
-            const estimateGasPrice = await contract.methods.retainToken(tokenId, destination).estimateGas({from: accounts[0], value: 1000});
-            console.log("ESTIMATED GAS PRICE: ", estimateGasPrice)
-            console.log("==== ", await contract.methods.holdCustody(tokenId).call());
-            contract.methods.retainToken(tokenId, destination).send({
+            const estimateGasPrice = await contract.methods.retainToken(selectedToken, destination).estimateGas({from: accounts[0], value: 1000});
+            contract.methods.retainToken(selectedToken, destination).send({
                 from: accounts[0],
                 value: 1000,
                 gasPrice: 30000000000,
@@ -279,8 +237,6 @@ function App() {
             })
 
             ;
-            // console.log("RETAIN TOKEN TX: ", tx);
-            // TODO print tokens in front (must be selectable)
         }
     }
 

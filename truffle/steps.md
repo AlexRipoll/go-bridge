@@ -4,9 +4,9 @@
 ### BACK
     go run cmd/main.go
 
-    go run cmd/go-bridgecli/main.go --fn mint 0xe2d56Ed64C3Ea318710AEBC47230a3e8b016ACD6 2
-    go run cmd/go-bridgecli/main.go --fn mint 0xe2d56Ed64C3Ea318710AEBC47230a3e8b016ACD6 4
-    go run cmd/go-bridgecli/main.go --fn mint 0xe2d56Ed64C3Ea318710AEBC47230a3e8b016ACD6 8
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 2
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 4
+    go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 8
 
     go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 1000
     go run cmd/go-bridgecli/main.go --fn mint 0xc239f1E97Fa0B8cCB76b95a48c297C61584Ccf88 2000

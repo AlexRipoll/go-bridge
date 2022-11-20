@@ -26,12 +26,6 @@ module.exports = {
             },
             network_id: '5',
         },
-        sepolia: {
-            provider: function() {
-                return new HDWalletProvider(privateKey, "https://sepolia.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
-            },
-            network_id: '11155111',
-        },
         mumbai: {
             provider: function() {
                 return new HDWalletProvider(privateKey, "https://matic-mumbai.chainstacklabs.com");
